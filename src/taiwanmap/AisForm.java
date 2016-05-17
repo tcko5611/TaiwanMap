@@ -18,6 +18,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -34,6 +36,11 @@ public class AisForm extends javax.swing.JFrame {
      */
     public AisForm() {
         initComponents();
+        buttonGroup1.add(realTimeRadioButton);
+        buttonGroup1.add(allTimeRadioButton);
+        realTimeRadioButton.setSelected(true);
+        this.mmsiCheckBox.setEnabled(true);
+        this.traceCheckBox.setEnabled(false);
         sdff = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
         messageSender = null;
         setTitle("鴻祺航太AIS-Map船舶記錄資料軌跡繪圖1.0");
@@ -45,32 +52,45 @@ public class AisForm extends javax.swing.JFrame {
         ((MyTable)infoTable).setSelfModel();
         // myTableModel = new MyTableModel();
         // infoTable.setModel(myTableModel);
+        // disable all unneeded buttons
+        this.startButton.setEnabled(false);
+        this.pauseButton.setEnabled(false);
+        this.continueButton.setEnabled(false);
+        this.slowButton.setEnabled(false);
+        this.fastButton.setEnabled(false);
+        this.stopButton.setEnabled(false);
+        this.startTextField.setEditable(false);
     }
 
     class OpenL implements ActionListener {
-    public void actionPerformed(ActionEvent e) {
-      JFileChooser c = new JFileChooser();
-      // Demonstrate "Open" dialog:
-      int rVal = c.showOpenDialog(AisForm.this);
-      if (rVal == JFileChooser.APPROVE_OPTION) {
-        fileNameLabel.setText(c.getCurrentDirectory().toString() + "\\" + c.getSelectedFile().getName());
-        aises = new Aises(fileNameLabel.getText());
-        Date beginDate = aises.getBeginDate();
-        Date endDate = aises.getEndDate();
-        double maxLat = aises.getMaxLat();
-        double minLat = aises.getMinLat();
-        double maxLng = aises.getMaxLng();
-        double minLng = aises.getMinLng();
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser c = new JFileChooser();
+            FileFilter filter = new FileNameExtensionFilter("csv file", new String[] {"csv"});
+            c.setFileFilter(filter);
+            // Demonstrate "Open" dialog:
+            int rVal = c.showOpenDialog(AisForm.this);
+            if (rVal == JFileChooser.APPROVE_OPTION) {
+                fileNameLabel.setText(c.getCurrentDirectory().toString() + "\\" + c.getSelectedFile().getName());
+                aises = new Aises(fileNameLabel.getText());
+                Date beginDate = aises.getBeginDate();
+                Date endDate = aises.getEndDate();
+                double maxLat = aises.getMaxLat();
+                double minLat = aises.getMinLat();
+                double maxLng = aises.getMaxLng();
+                double minLng = aises.getMinLng();
         
-        beginDateLabel.setText(sdff.format(beginDate));
-        endDateLabel.setText(sdff.format(endDate));
-        maxLatLabel.setText(String.format("%.2f", maxLat));
-        minLatLabel.setText(String.format("%.2f", minLat));
-        maxLngLabel.setText(String.format("%.2f", maxLng));
-        minLngLabel.setText(String.format("%.2f", minLng));
-      }
+                beginDateLabel.setText(sdff.format(beginDate));
+                endDateLabel.setText(sdff.format(endDate));
+                maxLatLabel.setText(String.format("%.2f", maxLat));
+                minLatLabel.setText(String.format("%.2f", minLat));
+                maxLngLabel.setText(String.format("%.2f", maxLng));
+                minLngLabel.setText(String.format("%.2f", minLng));
+                startButton.setEnabled(true);
+                startTextField.setEditable(true);
+            }
+        }
     }
-  }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -80,6 +100,7 @@ public class AisForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -111,15 +132,15 @@ public class AisForm extends javax.swing.JFrame {
         exitButton = new javax.swing.JButton();
         plotPanel = new PlotPanel();
         jLabel11 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jCheckBox2 = new javax.swing.JCheckBox();
-        jCheckBox3 = new javax.swing.JCheckBox();
-        jCheckBox4 = new javax.swing.JCheckBox();
+        mmsiCheckBox = new javax.swing.JCheckBox();
+        traceCheckBox = new javax.swing.JCheckBox();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         infoTable = new MyTable();
         stopButton = new javax.swing.JButton();
+        realTimeRadioButton = new javax.swing.JRadioButton();
+        allTimeRadioButton = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("AisForm"); // NOI18N
@@ -172,19 +193,19 @@ public class AisForm extends javax.swing.JFrame {
         minLngLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jLabel4.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jLabel4.setText("地圖左上座標");
+        jLabel4.setText("地圖中央座標");
 
         jLabel5.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         jLabel5.setText("N:");
 
         lat0TextField.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        lat0TextField.setText("25.5");
+        lat0TextField.setText("23.5");
 
         jLabel8.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         jLabel8.setText("E:");
 
         lng0TextField.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        lng0TextField.setText("119");
+        lng0TextField.setText("121");
 
         jLabel9.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         jLabel9.setText("範圍：");
@@ -217,16 +238,35 @@ public class AisForm extends javax.swing.JFrame {
 
         pauseButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         pauseButton.setText("暫停");
+        pauseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pauseButtonActionPerformed(evt);
+            }
+        });
 
         continueButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         continueButton.setText("繼續");
+        continueButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                continueButtonActionPerformed(evt);
+            }
+        });
 
         slowButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         slowButton.setText("變慢");
-        slowButton.setActionCommand("變慢");
+        slowButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                slowButtonActionPerformed(evt);
+            }
+        });
 
         fastButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         fastButton.setText("加快");
+        fastButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fastButtonActionPerformed(evt);
+            }
+        });
 
         exitButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         exitButton.setText("離開程式");
@@ -253,17 +293,21 @@ public class AisForm extends javax.swing.JFrame {
         jLabel11.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         jLabel11.setText("顯示選項");
 
-        jCheckBox1.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jCheckBox1.setText("MMSI");
+        mmsiCheckBox.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        mmsiCheckBox.setText("MMSI");
+        mmsiCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                mmsiCheckBoxItemStateChanged(evt);
+            }
+        });
 
-        jCheckBox2.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jCheckBox2.setText("即時軌跡");
-
-        jCheckBox3.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jCheckBox3.setText("全部軌跡");
-
-        jCheckBox4.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jCheckBox4.setText("軌跡連線");
+        traceCheckBox.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        traceCheckBox.setText("軌跡連線");
+        traceCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                traceCheckBoxItemStateChanged(evt);
+            }
+        });
 
         jTextArea1.setBackground(new java.awt.Color(240, 240, 240));
         jTextArea1.setColumns(20);
@@ -294,23 +338,48 @@ public class AisForm extends javax.swing.JFrame {
             }
         });
 
+        realTimeRadioButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        realTimeRadioButton.setText("即時軌跡");
+        realTimeRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                realTimeRadioButtonActionPerformed(evt);
+            }
+        });
+
+        allTimeRadioButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        allTimeRadioButton.setText("全部軌跡");
+        allTimeRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                allTimeRadioButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(plotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(93, 93, 93)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel11)
-                            .addComponent(jCheckBox1)
-                            .addComponent(jCheckBox2)
-                            .addComponent(jCheckBox3)
-                            .addComponent(jCheckBox4)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(60, 157, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel11)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(realTimeRadioButton)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(mmsiCheckBox))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(allTimeRadioButton)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(traceCheckBox)))
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -384,7 +453,7 @@ public class AisForm extends javax.swing.JFrame {
                                     .addComponent(exitButton)))
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 867, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -446,14 +515,14 @@ public class AisForm extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel11)
                         .addGap(18, 18, 18)
-                        .addComponent(jCheckBox1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(realTimeRadioButton)
+                            .addComponent(mmsiCheckBox))
                         .addGap(18, 18, 18)
-                        .addComponent(jCheckBox2)
-                        .addGap(18, 18, 18)
-                        .addComponent(jCheckBox3)
-                        .addGap(18, 18, 18)
-                        .addComponent(jCheckBox4)
-                        .addGap(120, 120, 120)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(allTimeRadioButton)
+                            .addComponent(traceCheckBox))
+                        .addGap(218, 218, 218)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(plotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(11, Short.MAX_VALUE))
@@ -467,14 +536,16 @@ public class AisForm extends javax.swing.JFrame {
     }//GEN-LAST:event_exitButtonActionPerformed
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-            double lng0 = Double.parseDouble(lng0TextField.getText());
-            double lat0 = Double.parseDouble(lat0TextField.getText());
+            double lng = Double.parseDouble(lng0TextField.getText());
+            double lat = Double.parseDouble(lat0TextField.getText());
             double range = Double.parseDouble(rangeTextField.getText());
-            Double lng1 = lng0 + range;
-            Double lat1 = lat0 - range;
+            Double lng0 = lng - range/2.0;
+            Double lng1 = lng + range/2.0;
+            Double lat0 = lat + range/2.0;
+            Double lat1 = lat - range/2.0;
             PlotPanel plotPanel1 = (PlotPanel) plotPanel;
             plotPanel1.setBoundary(lng0, lat0, lng1, lat1);
-            repaint();// TODO add your handling code here:
+            // plotPanel1.repaint();// TODO add your handling code here:
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
@@ -490,6 +561,18 @@ public class AisForm extends javax.swing.JFrame {
             messageSender.addObserver((PlotPanel) plotPanel);
             Executor sExecutor = Executors.newSingleThreadExecutor();
             sExecutor.execute(messageSender);
+            this.startButton.setEnabled(false);
+            this.pauseButton.setEnabled(true);
+            this.continueButton.setEnabled(true);
+            this.slowButton.setEnabled(true);
+            this.fastButton.setEnabled(true);
+            this.stopButton.setEnabled(true);
+            this.startTextField.setEditable(false);
+            this.okButton.setEnabled(false);
+            this.allTimeRadioButton.setEnabled(false);
+            this.realTimeRadioButton.setEnabled(false);
+            this.mmsiCheckBox.setEnabled(false);
+            this.traceCheckBox.setEnabled(false);
         } catch (ParseException ex) {
             Logger.getLogger(AisForm.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -497,7 +580,70 @@ public class AisForm extends javax.swing.JFrame {
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
        messageSender.setStop(); // TODO add your handling code here:
+       ((PlotPanel) plotPanel).clearData();
+        this.startButton.setEnabled(true);
+        this.pauseButton.setEnabled(false);
+        this.continueButton.setEnabled(false);
+        this.slowButton.setEnabled(false);
+        this.fastButton.setEnabled(false);
+        this.stopButton.setEnabled(false);
+        this.startTextField.setEditable(true);
+        this.okButton.setEnabled(true);
+        this.allTimeRadioButton.setEnabled(true);
+        this.realTimeRadioButton.setEnabled(true);
+        this.mmsiCheckBox.setEnabled(true);
+        this.traceCheckBox.setEnabled(false);
     }//GEN-LAST:event_stopButtonActionPerformed
+
+    private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
+        messageSender.setPause();        // TODO add your handling code here:
+    }//GEN-LAST:event_pauseButtonActionPerformed
+
+    private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
+        messageSender.unsetPause();// TODO add your handling code here:
+    }//GEN-LAST:event_continueButtonActionPerformed
+
+    private void slowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_slowButtonActionPerformed
+        messageSender.slowSpeed();// TODO add your handling code here:
+    }//GEN-LAST:event_slowButtonActionPerformed
+
+    private void fastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastButtonActionPerformed
+        messageSender.fastSpeed();// TODO add your handling code here:
+    }//GEN-LAST:event_fastButtonActionPerformed
+
+    private void realTimeRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_realTimeRadioButtonActionPerformed
+       this.mmsiCheckBox.setEnabled(true);        // TODO add your handling code here:
+       this.traceCheckBox.setSelected(false);
+       this.traceCheckBox.setEnabled(false);
+       ((PlotPanel)this.plotPanel).setRealTimeDraw();
+    }//GEN-LAST:event_realTimeRadioButtonActionPerformed
+
+    private void allTimeRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allTimeRadioButtonActionPerformed
+       this.mmsiCheckBox.setEnabled(false);        // TODO add your handling code here:
+       this.mmsiCheckBox.setSelected(false);
+       this.traceCheckBox.setEnabled(true);        // TODO add your handling code here:
+       ((PlotPanel)this.plotPanel).setAllTimeDraw();
+    }//GEN-LAST:event_allTimeRadioButtonActionPerformed
+
+    private void mmsiCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_mmsiCheckBoxItemStateChanged
+        if (evt.getStateChange() == java.awt.event.ItemEvent.DESELECTED) {
+            PlotPanel plotPanel1 = (PlotPanel) plotPanel;
+            plotPanel1.unshowMmsi();
+        } else if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED){
+            PlotPanel plotPanel1 = (PlotPanel) plotPanel;
+            plotPanel1.showMmsi();
+        }// TODO add your handling code here:
+    }//GEN-LAST:event_mmsiCheckBoxItemStateChanged
+
+    private void traceCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_traceCheckBoxItemStateChanged
+        if (evt.getStateChange() == java.awt.event.ItemEvent.DESELECTED) {
+            PlotPanel plotPanel1 = (PlotPanel) plotPanel;
+            plotPanel1.unshowTrace();
+        } else if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED){
+            PlotPanel plotPanel1 = (PlotPanel) plotPanel;
+            plotPanel1.showTrace();
+        }// TODO add your handling code here:        // TODO add your handling code here:
+    }//GEN-LAST:event_traceCheckBoxItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -535,17 +681,15 @@ public class AisForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton allTimeRadioButton;
     private javax.swing.JLabel beginDateLabel;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton continueButton;
     private javax.swing.JLabel endDateLabel;
     private javax.swing.JButton exitButton;
     private javax.swing.JButton fastButton;
     private javax.swing.JLabel fileNameLabel;
     private javax.swing.JTable infoTable;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
-    private javax.swing.JCheckBox jCheckBox3;
-    private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -566,15 +710,18 @@ public class AisForm extends javax.swing.JFrame {
     private javax.swing.JLabel maxLngLabel;
     private javax.swing.JLabel minLatLabel;
     private javax.swing.JLabel minLngLabel;
+    private javax.swing.JCheckBox mmsiCheckBox;
     private javax.swing.JButton okButton;
     private javax.swing.JButton pauseButton;
     private javax.swing.JPanel plotPanel;
     private javax.swing.JTextField rangeTextField;
     private javax.swing.JButton readFileButton;
+    private javax.swing.JRadioButton realTimeRadioButton;
     private javax.swing.JButton slowButton;
     private javax.swing.JButton startButton;
     private javax.swing.JTextField startTextField;
     private javax.swing.JButton stopButton;
+    private javax.swing.JCheckBox traceCheckBox;
     // End of variables declaration//GEN-END:variables
 }
 class MyTable extends javax.swing.JTable implements Observer {

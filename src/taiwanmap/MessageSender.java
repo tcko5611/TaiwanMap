@@ -5,6 +5,7 @@
  */
 package taiwanmap;
 
+import static java.lang.Thread.yield;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -24,8 +25,9 @@ public class MessageSender implements Runnable{
         this.startDate = startDate;
         this.endDate = endDate;
         currentDate = startDate;
-        this.speed = speed;
+        this.speed = speed * 65536;
         stop = false;
+        pause = false;
         observers = new LinkedList<Observer>();
     }
     ArrayList<Ais> aises;
@@ -36,6 +38,7 @@ public class MessageSender implements Runnable{
     int speed; // min/sec
     LinkedList<Observer> observers;
     Boolean stop;
+    Boolean pause;
     public void addObserver(Observer o) {
        observers.add(o);
     }
@@ -64,7 +67,10 @@ public class MessageSender implements Runnable{
             } catch (InterruptedException ex) {
                 Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
             }
-            currentDate.setTime(currentDate.getTime() + speed * 60000);
+            currentDate.setTime(currentDate.getTime() + getSpeed());
+            while (getPause()) {
+                yield();
+            }
         }
         return;
     }
@@ -73,6 +79,26 @@ public class MessageSender implements Runnable{
     }
     public synchronized Boolean getStop() {
         return stop;
+    }
+    public synchronized void setPause() {
+        pause = true;
+    }
+    public synchronized void unsetPause() {
+        pause = false;
+    }
+    public synchronized Boolean getPause() {
+        return pause;
+    }
+    public synchronized void slowSpeed() {
+        speed = speed/2;
+        if (speed < 1024) speed = 1024;
+    }
+    public synchronized void fastSpeed() {
+       speed *= 2;
+       if (speed > 4194304) speed = 4194304;
+    }
+    public synchronized int getSpeed() {
+      return speed;  
     }
 }
 
