@@ -19,4 +19,10 @@ public class Debugger{
           System.out.println(o.toString());
         }
     }
+
+    static void err(Object o) {
+        if (isEnabled()) {
+          System.err.println(o.toString());
+        }      
+    }
 }

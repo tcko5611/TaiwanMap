@@ -11,6 +11,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,6 +22,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.swing.JPanel;
 import java.lang.Integer;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 
 /**
@@ -31,7 +40,7 @@ public class PlotPanel extends JPanel implements Observer{
     private HashMap<Integer, Ais> ships;
     HashMap<Integer, ArrayList<Point> > shipsTracePts;
     ArrayList<Point> shipsPts;
-    ArrayList<Integer>mmsiPts;
+    // ArrayList<Integer>mmsiPts;
     double x0; // the left
     double y0; // the top 
     double x1; // the right
@@ -39,25 +48,31 @@ public class PlotPanel extends JPanel implements Observer{
     Boolean showMmsi;
     Boolean showTrace;
     DrawShips drawShips;
+    private ReentrantLock lock;
+    BufferedImage blueShip;
+    BufferedImage redShip;
     @Override 
-    public void update(Ais ais){
+    public void update(Ais ais) {
         addAis(ais);
-        ships.put(ais.getMmsi(), ais);
-        shipsPts.clear();
-        mmsiPts.clear();
-        for (Map.Entry<Integer, Ais> entry : ships.entrySet()) {
-            double x = entry.getValue().getLng();
-            double y = entry.getValue().getLat();
-            // int xMax = this.getWidth();
-            // int yMax = this.getHeight();
-            // int dx = (int) ((x-x0) * xMax / (x1-x0));
-            // int dy = (int) ((y-y0) * yMax /(y1-y0));
-            // System.out.println("x:" + dx + ", y:" + dy);
-            Point p = translateLocToPoint(x, y);
-            if (p != null) {
-                shipsPts.add(p);
-                mmsiPts.add(entry.getKey());
-            }  
+        lock.lock();
+        try {
+            ships.put(ais.getMmsi(), ais);
+            shipsPts.clear();
+            // mmsiPts.clear();
+            for (Map.Entry<Integer, Ais> entry : ships.entrySet()) {
+                double x = entry.getValue().getLng();
+                double y = entry.getValue().getLat();
+                Point p = translateLocToPoint(x, y);
+                if (p != null) {
+                    p.putMmsi(entry.getValue().getMmsi());
+                    p.putHeading(entry.getValue().getHeading());
+                    p.putSpeed(entry.getValue().getSpeed());
+                    shipsPts.add(p);
+                    // mmsiPts.add(entry.getKey());
+                }  
+            }
+        } finally {
+            lock.unlock();
         }
         repaint();
     }
@@ -69,7 +84,7 @@ public class PlotPanel extends JPanel implements Observer{
         ships = new HashMap<Integer, Ais>();
         shipsTracePts = new HashMap<Integer, ArrayList<Point> >();
         shipsPts = new ArrayList<Point>();
-        mmsiPts = new ArrayList<Integer>();
+        // mmsiPts = new ArrayList<Integer>();
         x0 = 119;
         x1 = 123;
         y0 = 25.5;
@@ -77,6 +92,15 @@ public class PlotPanel extends JPanel implements Observer{
         showMmsi = false;
         showTrace = false;
         drawShips = new DrawMmsiShips();
+        lock = new ReentrantLock();
+        ClassLoader classLoader = getClass().getClassLoader();
+        try {
+            blueShip = ImageIO.read(classLoader.getResourceAsStream("ico/blueShip.png"));
+            redShip  = ImageIO.read(classLoader.getResourceAsStream("ico/redShip.png"));
+            // translateLocToPoint();
+        } catch (IOException ex) {
+            Logger.getLogger(PlotPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     public void showMmsi() {
         showMmsi = true;
@@ -102,23 +126,33 @@ public class PlotPanel extends JPanel implements Observer{
         }
         return p;
     }
-    private synchronized void addAis(Ais ais) {
-        Integer mmsi = ais.getMmsi();
-        double x = ais.getLng();
-        double y = ais.getLat();
-        Point pt = this.translateLocToPoint(x, y);
-        if (shipsTrace.containsKey(mmsi)) { 
-            Aises aises = shipsTrace.get(mmsi);
-            ArrayList<Point> pts = shipsTracePts.get(mmsi);
-            aises.addAis(ais);
-            if (pt != null) pts.add(pt);
-        } else {
-            Aises aises = new Aises();
-            ArrayList<Point> pts = new ArrayList<Point>();
-            aises.addAis(ais);
-            if (pt != null) pts.add(pt);
-            shipsTrace.put(mmsi, aises);
-            shipsTracePts.put(mmsi, pts);
+    private void addAis(Ais ais) {
+        lock.lock();
+        try {
+            Integer mmsi = ais.getMmsi();
+            double x = ais.getLng();
+            double y = ais.getLat();
+            Point pt = this.translateLocToPoint(x, y);
+            if (pt != null) {
+                pt.putMmsi(ais.getMmsi());
+                pt.putHeading(ais.getHeading());
+                pt.putSpeed(ais.getSpeed());
+            }            
+            if (shipsTrace.containsKey(mmsi)) { 
+                Aises aises = shipsTrace.get(mmsi);
+                ArrayList<Point> pts = shipsTracePts.get(mmsi);
+                aises.addAis(ais);
+                if (pt != null)  pts.add(pt);
+            } else {
+                Aises aises = new Aises();
+                ArrayList<Point> pts = new ArrayList<Point>();
+                aises.addAis(ais);
+                if (pt != null) pts.add(pt);
+                shipsTrace.put(mmsi, aises);
+                shipsTracePts.put(mmsi, pts);
+            }
+        } finally {
+         lock.unlock();
         }
     }
     
@@ -134,7 +168,7 @@ public class PlotPanel extends JPanel implements Observer{
         shipsTrace.clear();
         ships.clear();
         shipsPts.clear();
-        mmsiPts.clear();
+        // mmsiPts.clear();
         translateLocToPoint();
         repaint();
     }
@@ -147,10 +181,9 @@ public class PlotPanel extends JPanel implements Observer{
             int yMax = this.getHeight();
             int dx = (int) ((x-x0) * xMax / (x1-x0));
             int dy = (int) ((y-y0) * yMax /(y1-y0));
-            System.out.println("x:" + dx + ", y:" + dy);
+            Debugger.log("x:" + dx + ", y:" + dy);
             if ((dx >= 0) && (dx <= xMax) && (dy>=0) && (dy <= yMax)) {
-                drawPts.add(new Point(dx,dy));
-                
+                drawPts.add(new Point(dx,dy));   
             }
         }
     }
@@ -190,18 +223,23 @@ public class PlotPanel extends JPanel implements Observer{
         //    g2d.fillOval(shipsPts.get(i).getX(), shipsPts.get(i).getY(), 5, 5);
         //}
         // drawPoints(g2d);
-        this.drawShips.drawShips(g2d);
+        lock.lock();
+        try {
+            this.drawShips.drawShips(g2d);
+        } finally {
+            lock.unlock();
+        }
     }
     private void drawPoints(Graphics2D g2d) {
         
         for (int i = 0; i < shipsPts.size(); i++) {
-            int x;
             Point pt = shipsPts.get(i);
-            x = shipsPts.get(i).getX();
+            int x = shipsPts.get(i).getX();
             int y = shipsPts.get(i).getY();
-            g2d.fillOval(x, y, 5, 5);
+            // g2d.fillOval(x, y, 5, 5);
+            g2d.drawImage(blueShip, x, y, null);
             if(showMmsi) {
-                g2d.drawString(mmsiPts.get(i).toString(), x, y);
+                g2d.drawString(pt.getMmsi().toString(), x, y);
             }
             
         }    
@@ -216,9 +254,22 @@ public class PlotPanel extends JPanel implements Observer{
             for (int i = 0; i < shipsPts.size(); i++) {
                 int x = shipsPts.get(i).getX();
                 int y = shipsPts.get(i).getY();
-                g2d.fillOval(x-2, y-2, 4, 4);
+                // g2d.fillOval(x-2, y-2, 4, 4);
+                double rot = Math.toRadians (shipsPts.get(i).getHeading());
+                double locationX = blueShip.getWidth() / 2;
+                double locationY = blueShip.getHeight() / 2;
+                AffineTransform tx = AffineTransform.getRotateInstance(rot, locationX, locationY);
+                AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+
+                // Drawing the rotated image at the required drawing locations
+                if (shipsPts.get(i).getSpeed() > 10.0) {
+                    g2d.drawImage(op.filter(redShip, null), x + 8, y - 8, null);
+                } else {
+                    g2d.drawImage(op.filter(blueShip, null), x + 8, y - 8, null);
+                }
+                // blueShip.paintIcon(outer, g2d, x, y);
                 if(showMmsi) {
-                    g2d.drawString(mmsiPts.get(i).toString(), x, y);
+                    g2d.drawString(shipsPts.get(i).getMmsi().toString(), x, y);
                 }  
             }    
         }
@@ -247,26 +298,46 @@ public class PlotPanel extends JPanel implements Observer{
     void setAllTimeDraw(){
         this.drawShips = new DrawTraceShips();
     }
-    void clearData() {
-        
+    void clearData() {     
         this.ships.clear();
         this.shipsPts.clear();
         this.shipsTrace.clear();
         this.shipsTracePts.clear();
-        this.mmsiPts.clear();
+        // this.mmsiPts.clear();
     }
 }
 class Point {
-    int x;
-    int y;
+    Integer mmsi = 0;
+    Integer x = 0;
+    Integer y = 0;
+    Integer heading = 0;
+    Double speed = 0.0;
     public Point(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+    public void putMmsi(int mmsi) {
+        this.mmsi = mmsi;
+    }
+    public Integer getMmsi() {
+        return mmsi;
     }
     public int getX() {
         return x;
     }
     public int getY() {
         return y;
+    }
+    public void putHeading(int heading){
+        this.heading = heading;
+    }
+    public Integer getHeading() {
+        return heading;
+    }
+    public void putSpeed(double speed) {
+        this.speed = speed;
+    }
+    public Double getSpeed() {
+        return speed;
     }
 }

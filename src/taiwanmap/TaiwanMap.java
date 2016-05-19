@@ -11,8 +11,10 @@ package taiwanmap;
  */
 
 import disandbeta.Location;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -56,22 +58,20 @@ public class TaiwanMap {
     private void getFile() {
         //Get file from resources folder
 	ClassLoader classLoader = getClass().getClassLoader();
-	File file = new File(classLoader.getResource("file/TaiwanLatLon.csv").getFile());
-
-	try (Scanner scanner = new Scanner(file)) {
-
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-                        StringTokenizer stok = new StringTokenizer(line, ",");
-                        double lat = Double.parseDouble(stok.nextToken());
-                        double lon = Double.parseDouble(stok.nextToken());
-                        locs.add(new Location(lat, lon));
-		}
-
-		scanner.close();
-
+	// File file = new File(classLoader.getResource("file/TaiwanLatLon.csv").getFile());
+        BufferedReader br = new BufferedReader(new InputStreamReader(
+                  classLoader.getResourceAsStream("file/TaiwanLatLon.csv")));
+        // File file = new File("file/TaiwanLatLon.csv");
+	try {
+            for (String line = br.readLine(); line != null; line = br.readLine()) {
+                StringTokenizer stok = new StringTokenizer(line, ",");
+                double lat = Double.parseDouble(stok.nextToken());
+                double lon = Double.parseDouble(stok.nextToken());
+                locs.add(new Location(lat, lon));
+            }
+            //  scanner.close();
 	} catch (IOException e) {
-		e.printStackTrace();
+            e.printStackTrace();
 	}
     }
 }

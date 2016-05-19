@@ -28,16 +28,8 @@ public class Aises {
         Aises aises = new Aises(fileName);
         SimpleDateFormat dt = new SimpleDateFormat("yyyyy.MM.dd HH:mm:ss");
         aises.dump();
-        System.out.println(dt.format(aises.beginDate));
-        System.out.println(dt.format(aises.endDate));
-        // String begin = "2016.05.13 07:32:42";
-        // String end = "2016.05.13 07:50:08";
-        // Date beginDate = dt.parse(begin);
-        // Date endDate = dt.parse(end);
-        // ArrayList<Ais> newAises = aises.getRegionsAis(beginDate, endDate);
-        // for(Ais ais : newAises) {
-        //     System.out.println(ais);
-        //}      
+        Debugger.log(dt.format(aises.beginDate));
+        Debugger.log(dt.format(aises.endDate));
     }
     private ArrayList<Ais> aises;
     private Date beginDate;
@@ -48,7 +40,7 @@ public class Aises {
     private double minLng;
     public void dump() {
         for (Ais ais: aises) {
-            System.out.println(ais);
+            Debugger.log(ais);
         }
     }
     public Aises(String fileName) {
@@ -57,7 +49,7 @@ public class Aises {
             parseAisFile(fileName);
             getBoundary();
         } catch (Exception e) {
-            System.err.println(fileName + " is not right");
+            Debugger.err(fileName + " is not right");
         }
     }
     public Aises() {
@@ -70,8 +62,8 @@ public class Aises {
         ArrayList<Ais> newAises = new ArrayList<Ais>();
         if (beginDate.before(endDate)) {
             for(Ais ais : aises) {
-                if (ais.getDate().after(beginDate) && 
-                    ais.getDate().before(endDate)) {
+                if ((ais.getDate().after(beginDate) || ais.getDate().equals(beginDate)) && 
+                    (ais.getDate().before(endDate) || ais.getDate().equals(endDate))) {
                     newAises.add(ais);
                 }
             }
@@ -136,9 +128,5 @@ public class Aises {
            aises.add(new Ais(date, mmsi, shipName, lng, lat, speed, cog, heading, rot, status));
 	}
         Collections.sort(aises);
-    }
-    public ArrayList<Ais> getRegionAises(Date startDate, Date endDate) {
-       ArrayList<Ais> localAises = new ArrayList<Ais>();
-       return localAises;
     }
 }

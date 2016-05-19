@@ -88,6 +88,8 @@ public class AisForm extends javax.swing.JFrame {
                 minLngLabel.setText(String.format("%.2f", minLng));
                 startButton.setEnabled(true);
                 startTextField.setEditable(true);
+                PlotPanel plotPanel1 = (PlotPanel) plotPanel;
+                plotPanel1.setBoundary(119, 25.5, 123, 21.5);
             }
         }
     }
@@ -433,16 +435,16 @@ public class AisForm extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addGroup(layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                             .addComponent(jLabel9)
                                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                             .addComponent(rangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel5)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(lat0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addComponent(stopButton))
+                                        .addComponent(stopButton))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel5)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(lat0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addGap(35, 35, 35)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
@@ -494,11 +496,10 @@ public class AisForm extends javax.swing.JFrame {
                                 .addComponent(jLabel8)
                                 .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel9)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(rangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(okButton)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(rangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(okButton)
+                                .addComponent(jLabel9))
                             .addGap(58, 58, 58))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(startButton)
@@ -563,16 +564,18 @@ public class AisForm extends javax.swing.JFrame {
             sExecutor.execute(messageSender);
             this.startButton.setEnabled(false);
             this.pauseButton.setEnabled(true);
-            this.continueButton.setEnabled(true);
+            // this.continueButton.setEnabled(true);
             this.slowButton.setEnabled(true);
             this.fastButton.setEnabled(true);
             this.stopButton.setEnabled(true);
             this.startTextField.setEditable(false);
             this.okButton.setEnabled(false);
+            this.readFileButton.setEnabled(false);
             this.allTimeRadioButton.setEnabled(false);
             this.realTimeRadioButton.setEnabled(false);
             this.mmsiCheckBox.setEnabled(false);
             this.traceCheckBox.setEnabled(false);
+            repaint();
         } catch (ParseException ex) {
             Logger.getLogger(AisForm.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -589,6 +592,7 @@ public class AisForm extends javax.swing.JFrame {
         this.stopButton.setEnabled(false);
         this.startTextField.setEditable(true);
         this.okButton.setEnabled(true);
+        this.readFileButton.setEnabled(true);
         this.allTimeRadioButton.setEnabled(true);
         this.realTimeRadioButton.setEnabled(true);
         this.mmsiCheckBox.setEnabled(true);
@@ -596,11 +600,18 @@ public class AisForm extends javax.swing.JFrame {
     }//GEN-LAST:event_stopButtonActionPerformed
 
     private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
-        messageSender.setPause();        // TODO add your handling code here:
+        // TODO add your handling code here:
+        messageSender.setPause();
+        continueButton.setEnabled(true);
+        pauseButton.setEnabled(false);
+        stopButton.setEnabled(false);
     }//GEN-LAST:event_pauseButtonActionPerformed
 
     private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
         messageSender.unsetPause();// TODO add your handling code here:
+        continueButton.setEnabled(false);
+        pauseButton.setEnabled(true);
+        stopButton.setEnabled(true);
     }//GEN-LAST:event_continueButtonActionPerformed
 
     private void slowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_slowButtonActionPerformed

@@ -18,6 +18,17 @@ import java.util.logging.Logger;
  * @author DELL
  */
 public class MessageSender implements Runnable{
+
+    ArrayList<Ais> aises;
+    int aisesIndex;
+    Date startDate;
+    Date endDate;
+    Date currentDate;
+    int speed; // min/sec
+    LinkedList<Observer> observers;
+    Boolean stop;
+    Boolean pause;
+    
     public MessageSender(ArrayList<Ais> aises, Date startDate, Date endDate, 
             int speed) {
         this.aises = aises;
@@ -30,15 +41,6 @@ public class MessageSender implements Runnable{
         pause = false;
         observers = new LinkedList<Observer>();
     }
-    ArrayList<Ais> aises;
-    int aisesIndex;
-    Date startDate;
-    Date endDate;
-    Date currentDate;
-    int speed; // min/sec
-    LinkedList<Observer> observers;
-    Boolean stop;
-    Boolean pause;
     public void addObserver(Observer o) {
        observers.add(o);
     }
