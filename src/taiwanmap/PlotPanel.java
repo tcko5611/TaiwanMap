@@ -51,6 +51,7 @@ public class PlotPanel extends JPanel implements Observer{
     private ReentrantLock lock;
     BufferedImage blueShip;
     BufferedImage redShip;
+    BufferedImage taiwan;
     @Override 
     public void update(Ais ais) {
         addAis(ais);
@@ -97,6 +98,8 @@ public class PlotPanel extends JPanel implements Observer{
         try {
             blueShip = ImageIO.read(classLoader.getResourceAsStream("ico/blueShip.png"));
             redShip  = ImageIO.read(classLoader.getResourceAsStream("ico/redShip.png"));
+            taiwan  = ImageIO.read(classLoader.getResourceAsStream("ico/Taiwan.PNG"));
+            // taiwanMap = ImageIO.read(classLoader.getResourceAsStream("ico/Taiwan.png"));
             // translateLocToPoint();
         } catch (IOException ex) {
             Logger.getLogger(PlotPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -199,6 +202,21 @@ public class PlotPanel extends JPanel implements Observer{
 	    RenderingHints.VALUE_ANTIALIAS_ON
          );
         g2d.setColor(Color.BLACK);
+        // add map
+        int w = taiwan.getWidth();
+        int h = taiwan.getHeight();
+        // BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        int cx0 = (int)((x0-119.0) * w/ 4.0);
+        int cy0 = (int)((25.5-y0) * h/ 4.0);
+        int dw = (int) ((x1-x0)*w/4.0);
+        int dh = (int) ((y0-y1)*h/4.0);
+        BufferedImage dest = taiwan.getSubimage(cx0, cy0, dw, dh);
+        AffineTransform at = AffineTransform.getScaleInstance(((double)this.getWidth())/dw, ((double)this.getHeight())/dh);
+        // at.scale(2.0, 2.0);
+        AffineTransformOp op = 
+            new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        g2d.drawImage(op.filter(dest, null), 0, 0, null);
+// after = scaleOp.filter(before, after);
         for (int i = 1; i < drawPts.size(); i++) {
             g2d.drawLine(drawPts.get(i-1).getX(), drawPts.get(i-1).getY(),
                     drawPts.get(i).getX(), drawPts.get(i).getY()); 
