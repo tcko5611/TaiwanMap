@@ -30,8 +30,9 @@ import javax.swing.ImageIcon;
 
 
 /**
- *
- * @author DELL
+ * Receive ais from MessageSender and plot them out
+ * @see MessageSender
+ * @author T.C.KO
  */
 public class PlotPanel extends JPanel implements Observer{
     ArrayList<Location> locs; // Taiwan map
@@ -52,6 +53,10 @@ public class PlotPanel extends JPanel implements Observer{
     BufferedImage blueShip;
     BufferedImage redShip;
     // BufferedImage taiwan;
+    /**
+     * Observer function to watch MessageSender
+     * @param ais ais from message sender
+     */
     @Override 
     public void update(Ais ais) {
         addAis(ais);
@@ -105,15 +110,27 @@ public class PlotPanel extends JPanel implements Observer{
             Logger.getLogger(PlotPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    /**
+     * control by main frame to set this will show information or not
+     */
     public void showMmsi() {
         showMmsi = true;
     }
+    /**
+     * control by main frame to set this will show information or not
+     */
     public void unshowMmsi() {
         showMmsi = false;
     }
+    /**
+     * control by main frame to set this will show information or not
+     */
     public void showTrace() {
         showTrace = true;
     }
+    /**
+     * control by main frame to set this will show information or not
+     */
     public void unshowTrace() {
         showTrace = false;
     }
@@ -158,10 +175,21 @@ public class PlotPanel extends JPanel implements Observer{
          lock.unlock();
         }
     }
-    
+    /**
+     * set the taiwan map informations
+     * @see TaiwanMap#getLocs() 
+     * @param locs taiwan map location points
+     */
     public void setLocs(ArrayList<Location> locs) {
         this.locs = locs;
     }
+    /**
+     *  set the draw latitude and logitude property
+     * @param x0 the smallest longitude
+     * @param y0 the largest latitude
+     * @param x1 the larget longitude
+     * @param y1 the smallest latitude
+     */
     public void setBoundary(double x0, double y0, double x1, double y1) {
         drawPts = new ArrayList<Point>();
         this.x0 = x0;
@@ -190,6 +218,11 @@ public class PlotPanel extends JPanel implements Observer{
             }
         }
     }
+    /**
+     * Draw the taiwan map, axis and for diffrent setting, draw latest ship points
+     * or the trace of ships
+     * @param g 
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -247,6 +280,7 @@ public class PlotPanel extends JPanel implements Observer{
             lock.unlock();
         }
     }
+    /*
     private void drawPoints(Graphics2D g2d) {
         
         for (int i = 0; i < shipsPts.size(); i++) {
@@ -261,10 +295,16 @@ public class PlotPanel extends JPanel implements Observer{
             
         }    
     }
-    
+    */
+    /**
+     *  interface to drawing strategy
+     */
     interface DrawShips {
         public void drawShips(Graphics2D g2d);
     }
+    /**
+     * mmsi draw strategy
+     */
     class DrawMmsiShips implements DrawShips {
         @Override
         public void drawShips(Graphics2D g2d) {
@@ -291,6 +331,9 @@ public class PlotPanel extends JPanel implements Observer{
             }    
         }
     }
+    /**
+     * draw trace strategy
+     */
     class DrawTraceShips implements DrawShips {
         @Override
         public void drawShips(Graphics2D g2d) {

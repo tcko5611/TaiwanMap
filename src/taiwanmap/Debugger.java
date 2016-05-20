@@ -6,8 +6,8 @@
 package taiwanmap;
 
 /**
- *
- * @author DELL
+ * Debuggin class, in release set isEnabled false 
+ * @author T.C.KO
  */
 public class Debugger{
     public static boolean isEnabled(){
@@ -20,7 +20,7 @@ public class Debugger{
         }
     }
 
-    static void err(Object o) {
+    public static void err(Object o) {
         if (isEnabled()) {
           System.err.println(o.toString());
         }      

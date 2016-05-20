@@ -61,7 +61,9 @@ public class AisForm extends javax.swing.JFrame {
         this.stopButton.setEnabled(false);
         this.startTextField.setEditable(false);
     }
-
+    /**
+    * listener for file choose button
+    */
     class OpenL implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -531,11 +533,17 @@ public class AisForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    /**
+    * exit button lisener method 
+    * @param evt 
+    */
     private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
         System.exit(0);// TODO add your handling code here:
     }//GEN-LAST:event_exitButtonActionPerformed
-
+    /**
+    * ok button lisener, will set the plotPanel boundary 
+    * @param evt 
+    */
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
             double lng = Double.parseDouble(lng0TextField.getText());
             double lat = Double.parseDouble(lat0TextField.getText());
@@ -548,7 +556,14 @@ public class AisForm extends javax.swing.JFrame {
             plotPanel1.setBoundary(lng0, lat0, lng1, lat1);
             // plotPanel1.repaint();// TODO add your handling code here:
     }//GEN-LAST:event_okButtonActionPerformed
-
+    /**
+    * start button lisener, 
+    * 1. will get the play start time and end time, then get region aises from Aises,
+    * 2. build message sender for about 5 min/sec
+    * 3. add obersers to message sender
+    * 4. told message sender start to send message from another thread
+    * @param evt 
+    */
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         try {
             Date startDate = sdff.parse(startTextField.getText());
@@ -735,6 +750,10 @@ public class AisForm extends javax.swing.JFrame {
     private javax.swing.JCheckBox traceCheckBox;
     // End of variables declaration//GEN-END:variables
 }
+/**
+ * Create my table because it need to observe message ender
+ * @author T.C.KO
+ */
 class MyTable extends javax.swing.JTable implements Observer {
     MyTableModel myTableModel;
     // public MyTable() {
@@ -742,19 +761,30 @@ class MyTable extends javax.swing.JTable implements Observer {
     //    myTableModel = new MyTableModel();
     //    setModel(myTableModel);
     // }
+    /**
+     * need this function to set table model after constructor
+     */
     public void setSelfModel() {
         myTableModel = new MyTableModel();
         setModel(myTableModel);   
     }
+    /**
+     * oberver function for message sender
+     * @param ais ais information from messge sender
+     */
     @Override
     public void update(Ais ais) {
         myTableModel.update(ais);
         repaint();
     }   
 }
+/**
+ * my table model for my table
+ * @author T.C.KO
+ */
 class MyTableModel extends AbstractTableModel implements Observer{
     Object[][] data={
-    {"12:09:12","333456789","121.123456","121.123456","EVER GREEN"}
+    {"","","","",""}
     };
     String[] columns={"時間","MMSI","經度","緯度","船名"};
     @Override 
@@ -780,7 +810,7 @@ class MyTableModel extends AbstractTableModel implements Observer{
         data[0][2] = lng;
         data[0][3] = lat;
         data[0][4] = shipName;
-        /*
+        /* not work, becasue STring is like int, Integer, behavior not like a pointer
         Object obj = getValueAt(0,0); obj = date;
         obj = getValueAt(0,1); obj = mmsi;
         obj = getValueAt(0,2); obj = lng;

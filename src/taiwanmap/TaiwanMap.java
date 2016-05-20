@@ -5,11 +5,6 @@
  */
 package taiwanmap;
 
-/**
- *
- * @author DELL
- */
-
 import disandbeta.Location;
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,19 +13,24 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-
+/**
+ * Store taiwan map point for use
+ * @author T.C.KO
+ */
 public class TaiwanMap {
     ArrayList<Location> locs;
     public static void main(String[] args) {
 	TaiwanMap obj = new TaiwanMap();
-        obj.getInfo();
-	// System.out.println(obj.getFile());		
+        obj.getInfo();	
     }
     public TaiwanMap() {
         locs = new ArrayList<Location>();
         getFile();
     }
-    public void getInfo() {
+    /**
+     * 
+     */
+    void getInfo() {
         double maxLat = 0.0;
         double maxLong = 0.0;
         double minLat = 200;
@@ -49,9 +49,13 @@ public class TaiwanMap {
                 minLong = loc.getLongitude();            
             }
         }
-        System.out.println("max lat: " + maxLat + ", min lat: " + minLat);
-        System.out.println("max long: " + maxLong + ", min long: " + minLong);
+        Debugger.log("max lat: " + maxLat + ", min lat: " + minLat);
+        Debugger.log("max long: " + maxLong + ", min long: " + minLong);
     }
+    /**
+     * 
+     * @return location points of taiwan map 
+     */
     public ArrayList<Location> getLocs() {
         return locs;
     }

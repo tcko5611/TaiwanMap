@@ -19,8 +19,9 @@ import java.util.Date;
 import java.util.StringTokenizer;
 
 /**
- *
- * @author DELL
+ * This is a class that collect all Ais
+ * @see Ais
+ * @author T.C.KO
  */
 public class Aises {
     public static void main(String[] args) throws ParseException {
@@ -38,11 +39,18 @@ public class Aises {
     private double minLat;
     private double maxLng;
     private double minLng;
+    /**
+     * This funtion dump all ais information
+     */
     public void dump() {
         for (Ais ais: aises) {
             Debugger.log(ais);
         }
     }
+    /**
+     * Will parse the cvs file and sort in date 
+     * @param fileName : csv file that contain ais information, must comes from our detection program
+     */
     public Aises(String fileName) {
         aises = new ArrayList<Ais>();
         try {
@@ -52,12 +60,25 @@ public class Aises {
             Debugger.err(fileName + " is not right");
         }
     }
+    /**
+     * empty contrutor
+     */
     public Aises() {
        aises = new ArrayList<Ais>();
     }
+    /**
+     * Add new ais
+     * @param ais : new ais 
+     */
     public void addAis(Ais ais) {
         aises.add(ais);
     }
+    /**
+     * Get a new ais list from a time period
+     * @param beginDate begin date
+     * @param endDate end date
+     * @return list of ais
+     */
     public ArrayList<Ais> getRegionsAis(Date beginDate, Date endDate) {
         ArrayList<Ais> newAises = new ArrayList<Ais>();
         if (beginDate.before(endDate)) {

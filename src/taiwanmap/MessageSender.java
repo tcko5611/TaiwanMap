@@ -14,8 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author DELL
+ * Design for send ais message in order
+ * @author T.C.KO
  */
 public class MessageSender implements Runnable{
 
@@ -28,7 +28,13 @@ public class MessageSender implements Runnable{
     LinkedList<Observer> observers;
     Boolean stop;
     Boolean pause;
-    
+    /**
+     * 
+     * @param aises : list of aises
+     * @param startDate : the begin date of play
+     * @param endDate : the end date of play
+     * @param speed : speed of send out ais, speed *65536 msec/sec ~ speed min/sec
+     */
     public MessageSender(ArrayList<Ais> aises, Date startDate, Date endDate, 
             int speed) {
         this.aises = aises;
@@ -41,18 +47,34 @@ public class MessageSender implements Runnable{
         pause = false;
         observers = new LinkedList<Observer>();
     }
+    /**
+     * 
+     * @param o observer of receive sending out information 
+     */
     public void addObserver(Observer o) {
        observers.add(o);
     }
+    /**
+     * 
+     * @param o remove observer o 
+     */
     public void removeObserver(Observer o) {
        observers.remove(o);
     }
+    /**
+     *  call observers to upddate
+     * @param ais : ais send to observers,  
+     */
     public void notifyObservers(Ais ais) {
        for(Iterator<Observer> iter = observers.iterator(); iter.hasNext();) {
           Observer obj = iter.next();
           obj.update(ais);
        }
     } 
+    /**
+     * thread function to send ais in date order and notify observer, 
+     * and be able to notify stop, pause and continue signals from setting 
+     */
     @Override
     public void run() {
         currentDate = startDate; 
@@ -103,7 +125,11 @@ public class MessageSender implements Runnable{
       return speed;  
     }
 }
-
+/**
+ * Observer interface that use for MessageSender
+ * @see MessageSender
+ * @author T.C.KO
+ */
 interface Observer {
     public void update(Ais ais);
 }

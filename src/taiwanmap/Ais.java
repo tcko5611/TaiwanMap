@@ -10,11 +10,23 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- *
- * @author DELL
+ * This is the Ais class that contain the ship information.
+ * @author T.C.KO
  */
 public class Ais implements Comparable<Ais> {
-
+    /**
+     *  
+     * @param date receive date time
+     * @param mmsi mmsi number
+     * @param shipName ship name
+     * @param lng longitude 
+     * @param lat latetude 
+     * @param speed speed 
+     * @param cog ocg
+     * @param heading heading
+     * @param rot rotation
+     * @param status status
+     */
     public Ais(Date date, int mmsi, String shipName, double lng, double lat, 
             double speed, int cog, int heading, String rot, String status) {
         this.date = date;
@@ -77,7 +89,11 @@ public class Ais implements Comparable<Ais> {
               status;
       return str;
     }
-
+    /**
+    * compare function for soring with date 
+    * @param o : another ais
+    * @return 1 if date is erarlier that o
+    */
     @Override
     public int compareTo(Ais o) {
         //return date.compareTo(o.date);
