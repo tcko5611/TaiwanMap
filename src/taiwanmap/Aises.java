@@ -6,9 +6,11 @@
 package taiwanmap;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -122,7 +124,7 @@ public class Aises {
         return minLng;
     }    
     private void parseAisFile(String fileName) throws FileNotFoundException, ParseException, IOException {
-        BufferedReader in = new BufferedReader(new FileReader(fileName));
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "big5"));
         String str;
         in.readLine();
         in.readLine();

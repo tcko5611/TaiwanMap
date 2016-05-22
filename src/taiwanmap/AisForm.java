@@ -45,7 +45,7 @@ public class AisForm extends javax.swing.JFrame {
         messageSender = null;
         setTitle("鴻祺航太AIS-Map船舶記錄資料軌跡繪圖1.0");
         readFileButton.addActionListener(new OpenL());
-        jTextArea1.setText("鴻祺航太有限公司\n設計者:\nH. Liu\nDr. T. Ko\n" +
+        jTextArea1.setText("鴻祺航太有限公司製作\n設計者:\nH. Liu\nDr. T. Ko\n" +
             "Dr. C. Tsai\nwww.hasco.com.tw\nLINE ID: hc66\nMade in Taiwan");
         infoTable.getTableHeader().setFont(new java.awt.Font("新細明體", 0, 18));
         
@@ -53,6 +53,7 @@ public class AisForm extends javax.swing.JFrame {
         // myTableModel = new MyTableModel();
         // infoTable.setModel(myTableModel);
         // disable all unneeded buttons
+        infoTable.getColumnModel().getColumn(0).setPreferredWidth(150);
         this.startButton.setEnabled(false);
         this.pauseButton.setEnabled(false);
         this.continueButton.setEnabled(false);
@@ -60,6 +61,7 @@ public class AisForm extends javax.swing.JFrame {
         this.fastButton.setEnabled(false);
         this.stopButton.setEnabled(false);
         this.startTextField.setEditable(false);
+        this.setLocationRelativeTo(null);
     }
     /**
     * listener for file choose button
@@ -84,10 +86,10 @@ public class AisForm extends javax.swing.JFrame {
         
                 beginDateLabel.setText(sdff.format(beginDate));
                 endDateLabel.setText(sdff.format(endDate));
-                maxLatLabel.setText(String.format("%.2f", maxLat));
-                minLatLabel.setText(String.format("%.2f", minLat));
-                maxLngLabel.setText(String.format("%.2f", maxLng));
-                minLngLabel.setText(String.format("%.2f", minLng));
+                maxLatLabel.setText(" N:" + String.format("%.2f", maxLat));
+                minLatLabel.setText(" N:" + String.format("%.2f", minLat));
+                maxLngLabel.setText(" E:" + String.format("%.2f", maxLng));
+                minLngLabel.setText(" E:" + String.format("%.2f", minLng));
                 startButton.setEnabled(true);
                 startTextField.setEditable(true);
                 PlotPanel plotPanel1 = (PlotPanel) plotPanel;
@@ -105,19 +107,24 @@ public class AisForm extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        plotPanel = new PlotPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        infoTable = new MyTable();
+        jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
         readFileButton = new javax.swing.JButton();
-        beginDateLabel = new javax.swing.JLabel();
-        endDateLabel = new javax.swing.JLabel();
         fileNameLabel = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        beginDateLabel = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        endDateLabel = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         maxLatLabel = new javax.swing.JLabel();
         minLatLabel = new javax.swing.JLabel();
-        maxLngLabel = new javax.swing.JLabel();
         minLngLabel = new javax.swing.JLabel();
+        maxLngLabel = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         lat0TextField = new javax.swing.JTextField();
@@ -126,6 +133,7 @@ public class AisForm extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         rangeTextField = new javax.swing.JTextField();
         okButton = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         startTextField = new javax.swing.JTextField();
         startButton = new javax.swing.JButton();
@@ -133,80 +141,177 @@ public class AisForm extends javax.swing.JFrame {
         continueButton = new javax.swing.JButton();
         slowButton = new javax.swing.JButton();
         fastButton = new javax.swing.JButton();
+        stopButton = new javax.swing.JButton();
         exitButton = new javax.swing.JButton();
-        plotPanel = new PlotPanel();
+        jPanel4 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
+        realTimeRadioButton = new javax.swing.JRadioButton();
         mmsiCheckBox = new javax.swing.JCheckBox();
+        allTimeRadioButton = new javax.swing.JRadioButton();
         traceCheckBox = new javax.swing.JCheckBox();
+        jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        infoTable = new MyTable();
-        stopButton = new javax.swing.JButton();
-        realTimeRadioButton = new javax.swing.JRadioButton();
-        allTimeRadioButton = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("AisForm"); // NOI18N
 
+        plotPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        plotPanel.setPreferredSize(new java.awt.Dimension(600, 600));
+
+        javax.swing.GroupLayout plotPanelLayout = new javax.swing.GroupLayout(plotPanel);
+        plotPanel.setLayout(plotPanelLayout);
+        plotPanelLayout.setHorizontalGroup(
+            plotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 598, Short.MAX_VALUE)
+        );
+        plotPanelLayout.setVerticalGroup(
+            plotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 598, Short.MAX_VALUE)
+        );
+
+        infoTable.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        infoTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(infoTable);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
         jLabel2.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         jLabel2.setText("AIS船舶記錄資料");
 
-        jLabel3.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jLabel3.setText("開始時間");
-        jLabel3.setToolTipText("");
-
-        jLabel1.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jLabel1.setText("結束時間");
-
         readFileButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         readFileButton.setText("讀取檔案");
-
-        beginDateLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        beginDateLabel.setText("2016.04.08 12:40:00");
-        beginDateLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        endDateLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        endDateLabel.setText("2016.05.14 18:05:00");
-        endDateLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         fileNameLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         fileNameLabel.setText("a.csv");
         fileNameLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
+        jLabel3.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        jLabel3.setText("開始時間：");
+        jLabel3.setToolTipText("");
+
+        beginDateLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        beginDateLabel.setText("2016.04.08 12:40:00");
+        beginDateLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jLabel1.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        jLabel1.setText("結束時間：");
+
+        endDateLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        endDateLabel.setText("2016.05.14 18:05:00");
+        endDateLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
         jLabel6.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jLabel6.setText("座標最高");
+        jLabel6.setText("座標最高：");
 
         jLabel7.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jLabel7.setText("座標最低");
+        jLabel7.setText("座標最低：");
 
         maxLatLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        maxLatLabel.setText("Ｎ:27.10");
+        maxLatLabel.setText(" N:27.10");
         maxLatLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         minLatLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        minLatLabel.setText("N:25.10");
+        minLatLabel.setText(" N:25.10");
         minLatLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
+        minLngLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        minLngLabel.setText(" E:120.10");
+        minLngLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
         maxLngLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        maxLngLabel.setText("E:122.10");
+        maxLngLabel.setText(" E:122.10");
         maxLngLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        minLngLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        minLngLabel.setText("E:120.10");
-        minLngLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(endDateLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(beginDateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(369, 369, 369))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(readFileButton)
+                        .addGap(30, 30, 30)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel7)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(minLatLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel6)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(maxLatLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(maxLngLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)
+                                    .addComponent(minLngLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(fileNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(readFileButton)
+                    .addComponent(fileNameLabel))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(beginDateLabel)
+                    .addComponent(jLabel6)
+                    .addComponent(maxLatLabel)
+                    .addComponent(maxLngLabel))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(endDateLabel)
+                    .addComponent(jLabel7)
+                    .addComponent(minLngLabel)
+                    .addComponent(minLatLabel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel4.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         jLabel4.setText("地圖中央座標");
 
         jLabel5.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jLabel5.setText("N:");
+        jLabel5.setText("N：");
 
         lat0TextField.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         lat0TextField.setText("23.5");
 
         jLabel8.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jLabel8.setText("E:");
+        jLabel8.setText("E：");
 
         lng0TextField.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         lng0TextField.setText("121");
@@ -224,6 +329,52 @@ public class AisForm extends javax.swing.JFrame {
                 okButtonActionPerformed(evt);
             }
         });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lat0TextField, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                            .addComponent(rangeTextField))
+                        .addGap(20, 20, 20)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel8)
+                                .addGap(18, 18, 18)
+                                .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(okButton))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(lat0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8)
+                    .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9)
+                    .addComponent(okButton))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel10.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         jLabel10.setText("軌跡開始時間");
@@ -272,68 +423,6 @@ public class AisForm extends javax.swing.JFrame {
             }
         });
 
-        exitButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        exitButton.setText("離開程式");
-        exitButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitButtonActionPerformed(evt);
-            }
-        });
-
-        plotPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        plotPanel.setPreferredSize(new java.awt.Dimension(600, 600));
-
-        javax.swing.GroupLayout plotPanelLayout = new javax.swing.GroupLayout(plotPanel);
-        plotPanel.setLayout(plotPanelLayout);
-        plotPanelLayout.setHorizontalGroup(
-            plotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 598, Short.MAX_VALUE)
-        );
-        plotPanelLayout.setVerticalGroup(
-            plotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 598, Short.MAX_VALUE)
-        );
-
-        jLabel11.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        jLabel11.setText("顯示選項");
-
-        mmsiCheckBox.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        mmsiCheckBox.setText("MMSI");
-        mmsiCheckBox.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                mmsiCheckBoxItemStateChanged(evt);
-            }
-        });
-
-        traceCheckBox.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        traceCheckBox.setText("軌跡連線");
-        traceCheckBox.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                traceCheckBoxItemStateChanged(evt);
-            }
-        });
-
-        jTextArea1.setBackground(new java.awt.Color(240, 240, 240));
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Monospaced", 0, 18)); // NOI18N
-        jTextArea1.setRows(5);
-        jTextArea1.setBorder(null);
-        jScrollPane2.setViewportView(jTextArea1);
-
-        infoTable.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        infoTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane3.setViewportView(infoTable);
-
         stopButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         stopButton.setText("停止");
         stopButton.addActionListener(new java.awt.event.ActionListener() {
@@ -342,11 +431,73 @@ public class AisForm extends javax.swing.JFrame {
             }
         });
 
+        exitButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        exitButton.setText("離開程式");
+        exitButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(startTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addComponent(startButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pauseButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(continueButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(slowButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(fastButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(stopButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                .addComponent(exitButton)
+                .addGap(22, 22, 22))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(startTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(startButton)
+                    .addComponent(pauseButton)
+                    .addComponent(continueButton)
+                    .addComponent(slowButton)
+                    .addComponent(fastButton)
+                    .addComponent(stopButton)
+                    .addComponent(exitButton))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel11.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        jLabel11.setText("顯示選項");
+
         realTimeRadioButton.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
         realTimeRadioButton.setText("即時軌跡");
         realTimeRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 realTimeRadioButtonActionPerformed(evt);
+            }
+        });
+
+        mmsiCheckBox.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        mmsiCheckBox.setText("MMSI");
+        mmsiCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                mmsiCheckBoxItemStateChanged(evt);
             }
         });
 
@@ -358,177 +509,110 @@ public class AisForm extends javax.swing.JFrame {
             }
         });
 
+        traceCheckBox.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        traceCheckBox.setText("軌跡連線");
+        traceCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                traceCheckBoxItemStateChanged(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel11)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(realTimeRadioButton)
+                            .addComponent(allTimeRadioButton))
+                        .addGap(30, 30, 30)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(traceCheckBox)
+                            .addComponent(mmsiCheckBox))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel11)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(realTimeRadioButton)
+                    .addComponent(mmsiCheckBox))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(allTimeRadioButton)
+                    .addComponent(traceCheckBox))
+                .addContainerGap(30, Short.MAX_VALUE))
+        );
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jTextArea1.setEditable(false);
+        jTextArea1.setBackground(new java.awt.Color(220, 220, 220));
+        jTextArea1.setColumns(20);
+        jTextArea1.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        jTextArea1.setRows(5);
+        jTextArea1.setBorder(null);
+        jTextArea1.setOpaque(false);
+        jScrollPane2.setViewportView(jTextArea1);
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(plotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(93, 93, 93)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(60, 157, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel11)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(realTimeRadioButton)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(mmsiCheckBox))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(allTimeRadioButton)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(traceCheckBox)))
-                                .addGap(0, 0, Short.MAX_VALUE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(36, 36, 36)
-                                .addComponent(readFileButton))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(42, 42, 42)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(startTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(endDateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(beginDateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(32, 32, 32)
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(fileNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(maxLatLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGap(48, 48, 48)
-                                        .addComponent(minLatLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(startButton)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(pauseButton)
-                                        .addGap(20, 20, 20)
-                                        .addComponent(continueButton)))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addGap(18, 18, 18)
-                                            .addComponent(slowButton)
-                                            .addGap(18, 18, 18)
-                                            .addComponent(fastButton))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addGap(41, 41, 41)
-                                            .addComponent(minLngLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(41, 41, 41)
-                                        .addComponent(maxLngLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                        .addGap(26, 26, 26)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                            .addComponent(jLabel9)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(rangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(stopButton))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel5)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(lat0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(35, 35, 35)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel8)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(okButton)
-                                    .addComponent(exitButton)))
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 867, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(readFileButton))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(beginDateLabel)
-                            .addComponent(jLabel6)
-                            .addComponent(maxLatLabel)
-                            .addComponent(maxLngLabel))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(endDateLabel)
-                            .addComponent(jLabel7)
-                            .addComponent(minLatLabel)
-                            .addComponent(minLngLabel))
-                        .addGap(31, 31, 31)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel10)
-                            .addComponent(startTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel4)
-                                .addComponent(fileNameLabel))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel5)
-                                .addComponent(lat0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel8)
-                                .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(rangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(okButton)
-                                .addComponent(jLabel9))
-                            .addGap(58, 58, 58))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(startButton)
-                            .addComponent(pauseButton)
-                            .addComponent(continueButton)
-                            .addComponent(slowButton)
-                            .addComponent(fastButton)
-                            .addComponent(exitButton)
-                            .addComponent(stopButton))))
-                .addGap(9, 9, 9)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel11)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(realTimeRadioButton)
-                            .addComponent(mmsiCheckBox))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(allTimeRadioButton)
-                            .addComponent(traceCheckBox))
-                        .addGap(218, 218, 218)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(plotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(plotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(118, 118, 118)
+                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -727,6 +811,11 @@ public class AisForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jTextArea1;

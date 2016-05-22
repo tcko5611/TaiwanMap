@@ -64,7 +64,7 @@ public class TaiwanMap {
 	ClassLoader classLoader = getClass().getClassLoader();
 	// File file = new File(classLoader.getResource("file/TaiwanLatLon.csv").getFile());
         BufferedReader br = new BufferedReader(new InputStreamReader(
-                  classLoader.getResourceAsStream("file/TaiwanLatLon.csv")));
+                  classLoader.getResourceAsStream("file/MapLatLon_TaiwanV2.csv")));
         // File file = new File("file/TaiwanLatLon.csv");
 	try {
             for (String line = br.readLine(); line != null; line = br.readLine()) {

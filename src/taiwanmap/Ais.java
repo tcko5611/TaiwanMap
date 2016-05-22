@@ -43,25 +43,25 @@ public class Ais implements Comparable<Ais> {
     public Date getDate() {
         return date;
     }
-    public int getMmsi() {
+    public Integer getMmsi() {
         return mmsi;
     }
     public String getShipName() {
         return shipName;
     }
-    public double getLng() {
+    public Double getLng() {
         return lng;
     }
-    public double getLat() {
+    public Double getLat() {
         return lat;
     }
-    public double getSpeed() {
+    public Double getSpeed() {
         return speed;
     }
-    public int getCog() {
+    public Integer getCog() {
         return cog;
     }
-    public int getHeading() {
+    public Integer getHeading() {
         return heading;
     }
     public String getRot() {
@@ -83,7 +83,7 @@ public class Ais implements Comparable<Ais> {
    @ Override  
     public String toString() {
       String str; 
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
       str = sdf.format(date) + "," + mmsi + "," + shipName + "," + lng + "," + 
               lat + "," + speed + "," + cog + "," + heading + "," + rot + "," + 
               status;
