@@ -5,6 +5,7 @@
  */
 package taiwanmap;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
@@ -17,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -54,6 +56,7 @@ public class AisForm extends javax.swing.JFrame {
         // infoTable.setModel(myTableModel);
         // disable all unneeded buttons
         infoTable.getColumnModel().getColumn(0).setPreferredWidth(150);
+        this.okButton.setEnabled(false);
         this.startButton.setEnabled(false);
         this.pauseButton.setEnabled(false);
         this.continueButton.setEnabled(false);
@@ -62,6 +65,10 @@ public class AisForm extends javax.swing.JFrame {
         this.stopButton.setEnabled(false);
         this.startTextField.setEditable(false);
         this.setLocationRelativeTo(null);
+        Dimension dim = new Dimension(37,25);
+        fileNameLabel.setMaximumSize(dim);
+        fileNameLabel.setMinimumSize(dim);
+        fileNameLabel.setPreferredSize(dim);
     }
     /**
     * listener for file choose button
@@ -90,6 +97,7 @@ public class AisForm extends javax.swing.JFrame {
                 minLatLabel.setText(" N:" + String.format("%.2f", minLat));
                 maxLngLabel.setText(" E:" + String.format("%.2f", maxLng));
                 minLngLabel.setText(" E:" + String.format("%.2f", minLng));
+                okButton.setEnabled(true);
                 startButton.setEnabled(true);
                 startTextField.setEditable(true);
                 PlotPanel plotPanel1 = (PlotPanel) plotPanel;
@@ -344,16 +352,16 @@ public class AisForm extends javax.swing.JFrame {
                             .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lat0TextField, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
-                            .addComponent(rangeTextField))
-                        .addGap(20, 20, 20)
+                            .addComponent(rangeTextField)
+                            .addComponent(lat0TextField, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(jLabel8)
                                 .addGap(18, 18, 18)
-                                .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(okButton))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(56, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -676,6 +684,7 @@ public class AisForm extends javax.swing.JFrame {
             this.traceCheckBox.setEnabled(false);
             repaint();
         } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "軌跡開始時間格式錯誤\n請用 yyyy.MM.dd hh:mm:ss");
             Logger.getLogger(AisForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_startButtonActionPerformed

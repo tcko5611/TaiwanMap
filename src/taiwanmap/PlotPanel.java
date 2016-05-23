@@ -204,7 +204,9 @@ public class PlotPanel extends JPanel implements Observer{
         repaint();
     }
     private void translateLocToPoint() {
-        
+        boolean isInDraw = false;
+        Point p = null;
+        Point pP = null;
         for (Location loc: locs) {
             double x = loc.getLongitude();
             double y = loc.getLatitude();
@@ -212,9 +214,23 @@ public class PlotPanel extends JPanel implements Observer{
             int yMax = this.getHeight();
             int dx = (int) ((x-x0) * xMax / (x1-x0));
             int dy = (int) ((y-y0) * yMax /(y1-y0));
+            pP = p;
+            p = new Point(dx, dy);
             Debugger.log("x:" + dx + ", y:" + dy);
-            if ((dx >= 0) && (dx <= xMax) && (dy>=0) && (dy <= yMax)) {
-                drawPts.add(new Point(dx,dy));   
+            if (isInDraw) {
+               drawPts.add(p);
+               if (!((dx >= 0) && (dx <= xMax) && (dy>=0) && (dy <= yMax))) {
+                   isInDraw = false;
+               }
+            }
+            else if ((dx >= 0) && (dx <= xMax) && (dy>=0) && (dy <= yMax)) {
+                if (!isInDraw && (pP != null)) {
+                   drawPts.add(pP); 
+                }
+                drawPts.add(p);
+                isInDraw = true;
+            } else {
+                isInDraw = false;
             }
         }
     }

@@ -392,21 +392,21 @@
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="lat0TextField" pref="45" max="32767" attributes="0"/>
                               <Component id="rangeTextField" max="32767" attributes="0"/>
+                              <Component id="lat0TextField" pref="63" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="lng0TextField" min="-2" pref="48" max="-2" attributes="0"/>
+                                  <Component id="lng0TextField" min="-2" pref="63" max="-2" attributes="0"/>
                               </Group>
                               <Component id="okButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="56" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

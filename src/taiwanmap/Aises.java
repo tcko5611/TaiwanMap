@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.StringTokenizer;
+import javax.swing.JOptionPane;
 
 /**
  * This is a class that collect all Ais
@@ -59,6 +60,7 @@ public class Aises {
             parseAisFile(fileName);
             getBoundary();
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, fileName + "is not correct");
             Debugger.err(fileName + " is not right");
         }
     }
