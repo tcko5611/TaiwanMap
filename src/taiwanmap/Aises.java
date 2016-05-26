@@ -32,8 +32,8 @@ public class Aises {
         Aises aises = new Aises(fileName);
         SimpleDateFormat dt = new SimpleDateFormat("yyyyy.MM.dd HH:mm:ss");
         aises.dump();
-        Debugger.log(dt.format(aises.beginDate));
-        Debugger.log(dt.format(aises.endDate));
+        // Debugger.log(dt.format(aises.beginDate));
+        // Debugger.log(dt.format(aises.endDate));
     }
     private ArrayList<Ais> aises;
     private Date beginDate;

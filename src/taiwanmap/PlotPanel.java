@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.swing.JPanel;
 import java.lang.Integer;
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,7 +59,7 @@ public class PlotPanel extends JPanel implements Observer{
      * @param ais ais from message sender
      */
     @Override 
-    public void update(Ais ais) {
+    public void update(Ais ais, Date date) {
         addAis(ais);
         lock.lock();
         try {
@@ -101,8 +102,8 @@ public class PlotPanel extends JPanel implements Observer{
         lock = new ReentrantLock();
         ClassLoader classLoader = getClass().getClassLoader();
         try {
-            blueShip = ImageIO.read(classLoader.getResourceAsStream("ico/blueShip.png"));
-            redShip  = ImageIO.read(classLoader.getResourceAsStream("ico/redShip.png"));
+            blueShip = ImageIO.read(classLoader.getResourceAsStream("ico/largeBlueShip.png"));
+            redShip  = ImageIO.read(classLoader.getResourceAsStream("ico/largeRedShip.png"));
             // taiwan  = ImageIO.read(classLoader.getResourceAsStream("ico/Taiwan.PNG"));
             // taiwanMap = ImageIO.read(classLoader.getResourceAsStream("ico/Taiwan.png"));
             // translateLocToPoint();
@@ -216,7 +217,7 @@ public class PlotPanel extends JPanel implements Observer{
             int dy = (int) ((y-y0) * yMax /(y1-y0));
             pP = p;
             p = new Point(dx, dy);
-            Debugger.log("x:" + dx + ", y:" + dy);
+            // Debugger.log("x:" + dx + ", y:" + dy);
             if (isInDraw) {
                drawPts.add(p);
                if (!((dx >= 0) && (dx <= xMax) && (dy>=0) && (dy <= yMax))) {
@@ -332,13 +333,16 @@ public class PlotPanel extends JPanel implements Observer{
                 double locationX = blueShip.getWidth() / 2;
                 double locationY = blueShip.getHeight() / 2;
                 AffineTransform tx = AffineTransform.getRotateInstance(rot, locationX, locationY);
+                //AffineTransform tx = AffineTransform.getRotateInstance(rot);
                 AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
                 // Drawing the rotated image at the required drawing locations
                 if (shipsPts.get(i).getSpeed() > 10.0) {
-                    g2d.drawImage(op.filter(redShip, null), x + 8, y - 8, null);
+                    g2d.fillOval(x-2, y-2, 4, 4); 
+                    g2d.drawImage(op.filter(redShip, null), x - 16 , y - 16, null);
                 } else {
-                    g2d.drawImage(op.filter(blueShip, null), x + 8, y - 8, null);
+                    g2d.fillOval(x-2, y-2, 4, 4); 
+                    g2d.drawImage(op.filter(blueShip, null), x - 16, y - 16, null);
                 }
                 // blueShip.paintIcon(outer, g2d, x, y);
                 if(showMmsi) {

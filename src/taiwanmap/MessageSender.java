@@ -42,7 +42,7 @@ public class MessageSender implements Runnable{
         this.startDate = startDate;
         this.endDate = endDate;
         currentDate = startDate;
-        this.speed = speed * 65536;
+        this.speed = speed * 1024;
         stop = false;
         pause = false;
         observers = new LinkedList<Observer>();
@@ -65,10 +65,10 @@ public class MessageSender implements Runnable{
      *  call observers to upddate
      * @param ais : ais send to observers,  
      */
-    public void notifyObservers(Ais ais) {
+    public void notifyObservers(Ais ais, Date date) {
        for(Iterator<Observer> iter = observers.iterator(); iter.hasNext();) {
           Observer obj = iter.next();
-          obj.update(ais);
+          obj.update(ais, date);
        }
     } 
     /**
@@ -77,14 +77,29 @@ public class MessageSender implements Runnable{
      */
     @Override
     public void run() {
-        currentDate = startDate; 
+        currentDate = startDate;
+        for (; aisesIndex < aises.size(); aisesIndex ++) {
+            if (getStop()) break;
+            Ais ais = aises.get(aisesIndex);
+            currentDate = ais.getDate();
+            notifyObservers(ais, currentDate);
+            try {
+                Thread.sleep(getSpeed());
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            while (getPause()) {
+                yield();
+            }
+        }
+        /*
         while (currentDate.before(endDate) && !getStop()) {
-            Debugger.log(aises.size());
+            // Debugger.log(aises.size());
             for (; aisesIndex < aises.size(); aisesIndex ++) {
                 Ais ais = aises.get(aisesIndex);
                 if (ais.getDate().after(currentDate)) break;
-                Debugger.log(ais);
-                notifyObservers(ais);
+                // Debugger.log(ais);
+                notifyObservers(ais, currentDate);
             }
             try {
                 Thread.sleep(1000);
@@ -96,6 +111,15 @@ public class MessageSender implements Runnable{
                 yield();
             }
         }
+        if (!getStop()) {
+            for (; aisesIndex < aises.size(); aisesIndex ++) {
+                Ais ais = aises.get(aisesIndex);
+                if (ais.getDate().after(currentDate)) break;
+                // Debugger.log(ais);
+                notifyObservers(ais, currentDate);
+            }
+        }
+        */
         return;
     }
     public synchronized void setStop() {
@@ -114,12 +138,12 @@ public class MessageSender implements Runnable{
         return pause;
     }
     public synchronized void slowSpeed() {
-        speed = speed/2;
-        if (speed < 1024) speed = 1024;
+        speed = speed*2;
+        if (speed > 1024) speed = 1024;
     }
     public synchronized void fastSpeed() {
-       speed *= 2;
-       if (speed > 4194304) speed = 4194304;
+       speed /= 2;
+       if (speed < 64) speed = 64;
     }
     public synchronized int getSpeed() {
       return speed;  
@@ -131,5 +155,5 @@ public class MessageSender implements Runnable{
  * @author T.C.KO
  */
 interface Observer {
-    public void update(Ais ais);
+    public void update(Ais ais, Date date);
 }
