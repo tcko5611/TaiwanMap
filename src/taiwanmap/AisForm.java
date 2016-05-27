@@ -162,6 +162,7 @@ public class AisForm extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         speedLabel = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         realTimeRadioButton = new javax.swing.JRadioButton();
@@ -467,7 +468,10 @@ public class AisForm extends javax.swing.JFrame {
         jLabel13.setText("繪圖速度：");
 
         speedLabel.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
-        speedLabel.setText("１");
+        speedLabel.setText("1");
+
+        jLabel14.setFont(new java.awt.Font("新細明體", 0, 18)); // NOI18N
+        jLabel14.setText("筆/秒");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -486,8 +490,10 @@ public class AisForm extends javax.swing.JFrame {
                         .addComponent(exitButton)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel13)
-                        .addGap(18, 18, 18)
-                        .addComponent(speedLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(speedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel14))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(stopButton)
                         .addGap(18, 18, 18)
@@ -499,7 +505,7 @@ public class AisForm extends javax.swing.JFrame {
                         .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(startTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -524,7 +530,8 @@ public class AisForm extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exitButton)
                     .addComponent(jLabel13)
-                    .addComponent(speedLabel))
+                    .addComponent(speedLabel)
+                    .addComponent(jLabel14))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -647,7 +654,7 @@ public class AisForm extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -775,7 +782,7 @@ public class AisForm extends javax.swing.JFrame {
         continueButton.setEnabled(true);
         pauseButton.setEnabled(false);
         stopButton.setEnabled(false);
-        okButton.setEnabled(true);
+        //okButton.setEnabled(true);
     }//GEN-LAST:event_pauseButtonActionPerformed
 
     private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
@@ -788,18 +795,28 @@ public class AisForm extends javax.swing.JFrame {
 
     private void slowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_slowButtonActionPerformed
         messageSender.slowSpeed();// TODO add your handling code here:
+        Integer speeds[] = {1,2,4,8,16};
         Integer speed = Integer.parseInt(speedLabel.getText());
-        speed -= 1;
-        if(speed < 1) speed = 1;
+        for (int i = speeds.length - 1; i >= 0; i--) {
+            if (speed > speeds[i]) {
+                speed = speeds[i];
+                break;
+            }
+        }
         speedLabel.setText(speed.toString());
         // this.speedLabel.setText(Integer.toString(messageSender.getSpeed()));
     }//GEN-LAST:event_slowButtonActionPerformed
 
     private void fastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fastButtonActionPerformed
         messageSender.fastSpeed();// TODO add your handling code here:
+        Integer speeds[] = {1,2,4,8,16};
         Integer speed = Integer.parseInt(speedLabel.getText());
-        speed += 1;
-        if(speed > 5) speed = 5;
+        for (int i = 0; i < speeds.length; i++) {
+            if (speed < speeds[i]) {
+                speed = speeds[i];
+                break;
+            }
+        }
         speedLabel.setText(speed.toString());
         // this.speedLabel.setText(Integer.toString(messageSender.getSpeed()));
     }//GEN-LAST:event_fastButtonActionPerformed
@@ -888,6 +905,7 @@ public class AisForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
