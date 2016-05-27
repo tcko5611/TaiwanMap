@@ -156,4 +156,5 @@ public class MessageSender implements Runnable{
  */
 interface Observer {
     public void update(Ais ais, Date date);
+    // public void updateAises(ArrayList<Ais> aises);
 }

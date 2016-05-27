@@ -38,7 +38,7 @@ import javax.swing.ImageIcon;
 public class PlotPanel extends JPanel implements Observer{
     ArrayList<Location> locs; // Taiwan map
     ArrayList<Point> drawPts; // Taiwan map
-    private HashMap<Integer, Aises> shipsTrace;
+    private HashMap<Integer, ArrayList<Ais>> shipsTrace;
     private HashMap<Integer, Ais> ships;
     HashMap<Integer, ArrayList<Point> > shipsTracePts;
     ArrayList<Point> shipsPts;
@@ -87,7 +87,7 @@ public class PlotPanel extends JPanel implements Observer{
         TaiwanMap taiwanMap = new TaiwanMap();
         locs = taiwanMap.getLocs();
         drawPts = new ArrayList<Point>();
-        shipsTrace = new HashMap<Integer, Aises>();
+        shipsTrace = new HashMap<Integer, ArrayList<Ais>>();
         ships = new HashMap<Integer, Ais>();
         shipsTracePts = new HashMap<Integer, ArrayList<Point> >();
         shipsPts = new ArrayList<Point>();
@@ -160,14 +160,14 @@ public class PlotPanel extends JPanel implements Observer{
                 pt.putSpeed(ais.getSpeed());
             }            
             if (shipsTrace.containsKey(mmsi)) { 
-                Aises aises = shipsTrace.get(mmsi);
+                ArrayList<Ais> aises = shipsTrace.get(mmsi);
                 ArrayList<Point> pts = shipsTracePts.get(mmsi);
-                aises.addAis(ais);
+                aises.add(ais);
                 if (pt != null)  pts.add(pt);
             } else {
-                Aises aises = new Aises();
+                ArrayList<Ais> aises = new ArrayList<Ais>();
                 ArrayList<Point> pts = new ArrayList<Point>();
-                aises.addAis(ais);
+                aises.add(ais);
                 if (pt != null) pts.add(pt);
                 shipsTrace.put(mmsi, aises);
                 shipsTracePts.put(mmsi, pts);
