@@ -8,6 +8,7 @@ package taiwanmap;
 import disandbeta.Location;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -251,6 +252,11 @@ public class PlotPanel extends JPanel implements Observer{
             RenderingHints.KEY_ANTIALIASING,
 	    RenderingHints.VALUE_ANTIALIAS_ON
          );
+        // Font font = this.getFont();
+        // g2d.setFont(new java.awt.Font("新細明體", 0, 24));
+        // g2d.setColor(Color.BLUE);
+        // g2d.drawString("HASco", xMax/2, yMax/2);
+        // g2d.setFont(font);
         g2d.setColor(Color.BLACK);
         // add map
         // int w = taiwan.getWidth();
