@@ -342,6 +342,11 @@ public class PlotPanel extends JPanel implements Observer{
             lock.unlock();
         }
     }
+
+    @Override
+    public void updateStatus(boolean hasNextData, boolean hasPrevData) {
+        return;
+    }
     /*
     private void drawPoints(Graphics2D g2d) {
         

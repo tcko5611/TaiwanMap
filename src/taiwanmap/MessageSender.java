@@ -77,6 +77,12 @@ public class MessageSender implements Runnable{
           obj.updateAises(aises);
        }
     } 
+    public void notifyObserversStatus(boolean hasNextData, boolean hasPrevData) {
+       for(Iterator<Observer> iter = observers.iterator(); iter.hasNext();) {
+          Observer obj = iter.next();
+          obj.updateStatus(hasNextData, hasPrevData);
+       }
+    } 
     /**
      * thread function to send ais in date order and notify observer, 
      * and be able to notify stop, pause and continue signals from setting 
@@ -91,14 +97,15 @@ public class MessageSender implements Runnable{
                 int i = 0;
                 for (; aisesIndex < aises.size(); aisesIndex ++) {
                     if (getStop()) break OuterLoop;
-                    Ais ais = aises.get(aisesIndex);
-                    // currentDate = ais.getDate();
-                    notifyObservers(ais);
-                    Thread.sleep(getSpeed());
                     while (getPause() && !getStop()) {
                         yield();
                     }
+                    Ais ais = aises.get(aisesIndex);
+                    // currentDate = ais.getDate();
+                    notifyObservers(ais);
+                    Thread.sleep(getSpeed());                  
                 }
+                // if (aisesIndex >= aises.size()) this.notifyObserversStatus(false, true);
                 if (getStop()) break OuterLoop;
                 yield();
             }
@@ -164,18 +171,33 @@ public class MessageSender implements Runnable{
       return speed;  
     }
     public void backwardOneStep() {
-        ArrayList<Ais> aises = new ArrayList<Ais>();
-        if (aisesIndex > 0)  aisesIndex -= 1;
-        for (int i = 0; i < aisesIndex; i++) {
-            aises.add(this.aises.get(i));
+        ArrayList<Ais> aisesLocal = new ArrayList<>();
+        if (aisesIndex <= 0) {
+            this.notifyObserversStatus(true, false);
+            return;
         }
-        notifyObserversAises(aises);
+        for (int i = 0; i < aisesIndex; i++) {
+            aisesLocal.add(this.aises.get(i));
+        }
+        aisesIndex -= 1;
+        notifyObserversAises(aisesLocal);
+        if (aisesIndex <= 0) 
+            this.notifyObserversStatus(true, false);
+        else
+            this.notifyObserversStatus(true, true);
     }
     public void forwardOneStep() {
-        if (aisesIndex >= (aises.size() -1) ) return;
+        if (aisesIndex >= (aises.size() -1) ) {
+            this.notifyObserversStatus(false, true);
+            return;
+        }
         aisesIndex += 1;
         Ais ais = aises.get(aisesIndex);
         notifyObservers(ais);
+        if (aisesIndex >= (aises.size() -1) )
+            this.notifyObserversStatus(false, true);
+        else
+            this.notifyObserversStatus(true, true);
     }
 }
 /**
@@ -186,5 +208,5 @@ public class MessageSender implements Runnable{
 interface Observer {
     public void update(Ais ais);
     public void updateAises(ArrayList<Ais> aises);
-    
+    public void updateStatus(boolean hasNextData, boolean hasPrevData);   
 }

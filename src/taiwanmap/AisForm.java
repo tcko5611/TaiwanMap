@@ -32,7 +32,7 @@ import java.util.concurrent.ExecutorService;
  *
  * @author DELL
  */
-public class AisForm extends javax.swing.JFrame {
+public class AisForm extends javax.swing.JFrame implements Observer{
     private Aises aises; // aises group
     // private MyTableModel myTableModel ;
     DateFormat sdff;
@@ -75,12 +75,38 @@ public class AisForm extends javax.swing.JFrame {
         this.slowButton.setEnabled(false);
         this.fastButton.setEnabled(false);
         this.stopButton.setEnabled(false);
+        this.forwardButton.setEnabled(false);
+        this.backwardButton.setEnabled(false);
         this.startTextField.setEditable(false);
         this.setLocationRelativeTo(null);
         Dimension dim = new Dimension(37,25);
         fileNameLabel.setMaximumSize(dim);
         fileNameLabel.setMinimumSize(dim);
         fileNameLabel.setPreferredSize(dim);
+    }
+
+    @Override
+    public void update(Ais ais) {
+        return;
+    }
+
+    @Override
+    public void updateAises(ArrayList<Ais> aises) {
+        return;
+    }
+
+    @Override
+    public void updateStatus(boolean hasNextData, boolean hasPrevData) {
+        if (!hasNextData) {
+            this.forwardButton.setEnabled(false);
+        } else {
+            this.forwardButton.setEnabled(true);
+        }
+        if (!hasPrevData) {
+            this.backwardButton.setEnabled(false);
+        } else {
+            this.backwardButton.setEnabled(true);
+        }
     }
     /**
     * listener for file choose button
@@ -175,6 +201,8 @@ public class AisForm extends javax.swing.JFrame {
         jLabel13 = new javax.swing.JLabel();
         speedLabel = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        forwardButton = new javax.swing.JButton();
+        backwardButton = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         realTimeRadioButton = new javax.swing.JRadioButton();
@@ -398,16 +426,18 @@ public class AisForm extends javax.swing.JFrame {
                 .addGap(6, 6, 6)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel8)
-                    .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lat0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lat0TextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel5)
+                        .addComponent(jLabel8)
+                        .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(okButton)
-                    .addComponent(rangeTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(rangeTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel9)
+                        .addComponent(okButton)))
                 .addContainerGap())
         );
 
@@ -488,6 +518,22 @@ public class AisForm extends javax.swing.JFrame {
         jLabel14.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
         jLabel14.setText("筆/秒");
 
+        forwardButton.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        forwardButton.setText("前進一筆");
+        forwardButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                forwardButtonActionPerformed(evt);
+            }
+        });
+
+        backwardButton.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        backwardButton.setText("後退一筆");
+        backwardButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backwardButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -520,8 +566,12 @@ public class AisForm extends javax.swing.JFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                             .addComponent(slowButton)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(fastButton))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(fastButton)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(forwardButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(backwardButton)))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -541,6 +591,10 @@ public class AisForm extends javax.swing.JFrame {
                     .addComponent(stopButton)
                     .addComponent(slowButton)
                     .addComponent(fastButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(forwardButton)
+                    .addComponent(backwardButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exitButton)
@@ -638,7 +692,7 @@ public class AisForm extends javax.swing.JFrame {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -651,11 +705,11 @@ public class AisForm extends javax.swing.JFrame {
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
                     .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(plotPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 450, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 275, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -665,16 +719,16 @@ public class AisForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -738,6 +792,7 @@ public class AisForm extends javax.swing.JFrame {
             messageSender.addObserver(infoTable1);
             messageSender.addObserver((PlotPanel) plotPanel);
             messageSender.addObserver(myProgressBar);
+            messageSender.addObserver(this);
             // messageSender.addObserver((MyLabel) currentTimeLabel);
             // Executor sExecutor = Executors.newSingleThreadExecutor();
             // messageExecutor = Executors.newSingleThreadExecutor();
@@ -789,6 +844,8 @@ public class AisForm extends javax.swing.JFrame {
         pauseButton.setEnabled(false);
         // stopButton.setEnabled(false);
         okButton.setEnabled(true);
+        this.forwardButton.setEnabled(true);
+        this.backwardButton.setEnabled(true);
     }//GEN-LAST:event_pauseButtonActionPerformed
 
     private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
@@ -797,6 +854,8 @@ public class AisForm extends javax.swing.JFrame {
         pauseButton.setEnabled(true);
         // stopButton.setEnabled(true);
         okButton.setEnabled(false);
+        this.forwardButton.setEnabled(false);
+        this.backwardButton.setEnabled(false);
     }//GEN-LAST:event_continueButtonActionPerformed
 
     private void slowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_slowButtonActionPerformed
@@ -861,6 +920,16 @@ public class AisForm extends javax.swing.JFrame {
         }// TODO add your handling code here:        // TODO add your handling code here:
     }//GEN-LAST:event_traceCheckBoxItemStateChanged
 
+    private void forwardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forwardButtonActionPerformed
+        // TODO add your handling code here:
+        this.messageSender.forwardOneStep();
+    }//GEN-LAST:event_forwardButtonActionPerformed
+
+    private void backwardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backwardButtonActionPerformed
+        // TODO add your handling code here:
+        this.messageSender.backwardOneStep();
+    }//GEN-LAST:event_backwardButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -902,6 +971,7 @@ public class AisForm extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton allTimeRadioButton;
+    private javax.swing.JButton backwardButton;
     private javax.swing.JLabel beginDateLabel;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton continueButton;
@@ -909,6 +979,7 @@ public class AisForm extends javax.swing.JFrame {
     private javax.swing.JButton exitButton;
     private javax.swing.JButton fastButton;
     private javax.swing.JLabel fileNameLabel;
+    private javax.swing.JButton forwardButton;
     private javax.swing.JTable infoTable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -989,6 +1060,11 @@ class MyTable extends javax.swing.JTable implements Observer {
         myTableModel.update(ais);
         repaint();
     }   
+
+    @Override
+    public void updateStatus(boolean hasNextData, boolean hasPrevData) {
+        return;
+    }
 }
 /**
  * my table model for my table
@@ -1059,6 +1135,11 @@ class MyProgressBar extends javax.swing.JProgressBar implements Observer {
         // Debugger.log("interval:" + interval);
         // Debugger.log("begin Date:" + sdff.format(beginDate));
         // Debugger.log("date:" + sdff.format(date));
+    }
+
+    @Override
+    public void updateStatus(boolean hasNextData, boolean hasPrevData) {
+        return;
     }
 }
 /*
