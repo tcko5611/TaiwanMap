@@ -26,6 +26,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 /**
  *
@@ -36,6 +37,7 @@ public class AisForm extends javax.swing.JFrame {
     // private MyTableModel myTableModel ;
     DateFormat sdff;
     MessageSender messageSender;
+    ExecutorService messageExecutor;
     /**
      * Creates new form AisForm
      */
@@ -48,6 +50,7 @@ public class AisForm extends javax.swing.JFrame {
         this.traceCheckBox.setEnabled(false);
         sdff = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
         messageSender = null;
+        messageExecutor = Executors.newSingleThreadExecutor();
         setTitle("鴻祺航太AIS-Map船舶記錄資料軌跡繪圖1.0");
         ClassLoader classLoader = getClass().getClassLoader();
         BufferedImage title = ImageIO.read(classLoader.getResourceAsStream("ico/title.png"));
@@ -736,8 +739,9 @@ public class AisForm extends javax.swing.JFrame {
             messageSender.addObserver((PlotPanel) plotPanel);
             messageSender.addObserver(myProgressBar);
             // messageSender.addObserver((MyLabel) currentTimeLabel);
-            Executor sExecutor = Executors.newSingleThreadExecutor();
-            sExecutor.execute(messageSender);
+            // Executor sExecutor = Executors.newSingleThreadExecutor();
+            // messageExecutor = Executors.newSingleThreadExecutor();
+            messageExecutor.execute(messageSender);
             this.startButton.setEnabled(false);
             this.pauseButton.setEnabled(true);
             // this.continueButton.setEnabled(true);
@@ -760,6 +764,7 @@ public class AisForm extends javax.swing.JFrame {
     }//GEN-LAST:event_startButtonActionPerformed
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
+       // messageExecutor.shutdownNow();
        messageSender.setStop(); // TODO add your handling code here:
        ((PlotPanel) plotPanel).clearData();
         this.startButton.setEnabled(true);
@@ -782,15 +787,15 @@ public class AisForm extends javax.swing.JFrame {
         messageSender.setPause();
         continueButton.setEnabled(true);
         pauseButton.setEnabled(false);
-        stopButton.setEnabled(false);
-        // okButton.setEnabled(true);
+        // stopButton.setEnabled(false);
+        okButton.setEnabled(true);
     }//GEN-LAST:event_pauseButtonActionPerformed
 
     private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
         messageSender.unsetPause();// TODO add your handling code here:
         continueButton.setEnabled(false);
         pauseButton.setEnabled(true);
-        stopButton.setEnabled(true);
+        // stopButton.setEnabled(true);
         okButton.setEnabled(false);
     }//GEN-LAST:event_continueButtonActionPerformed
 
@@ -972,8 +977,16 @@ class MyTable extends javax.swing.JTable implements Observer {
      * @param ais ais information from messge sender
      */
     @Override
-    public void update(Ais ais, Date date) {
-        myTableModel.update(ais, date);
+    public void updateAises(ArrayList<Ais> aises) {
+        if(aises.isEmpty()) {
+            return;
+        }
+        Ais ais = aises.get(aises.size()-1);
+        update(ais);
+    }
+    @Override
+    public void update(Ais ais) {
+        myTableModel.update(ais);
         repaint();
     }   
 }
@@ -981,7 +994,7 @@ class MyTable extends javax.swing.JTable implements Observer {
  * my table model for my table
  * @author T.C.KO
  */
-class MyTableModel extends AbstractTableModel implements Observer{
+class MyTableModel extends AbstractTableModel {
     Object[][] data={
     {"","","","",""}
     };
@@ -996,8 +1009,8 @@ class MyTableModel extends AbstractTableModel implements Observer{
     public int getRowCount() {return data.length;}
     @Override
     public Object getValueAt(int row, int col) {return data[row][col];}
-    @Override
-    public void update(Ais ais, Date date1) {
+    
+    public void update(Ais ais) {
         SimpleDateFormat sdff = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
         String date = sdff.format(ais.getDate());
         Integer mmsi = ais.getMmsi();
@@ -1029,7 +1042,17 @@ class MyProgressBar extends javax.swing.JProgressBar implements Observer {
         endDate = new Date(endDate.getTime());
     }
     @Override
-    public void update(Ais ais, Date date) {
+    public void updateAises(ArrayList<Ais> aises) {
+      if (aises.isEmpty()) {
+         setValue(0);
+         return;
+      }
+      Ais ais = aises.get(aises.size()-1);
+      update(ais);
+    }
+    @Override
+    public void update(Ais ais) {
+        Date date = ais.getDate();
         int interval = (int) ((date.getTime() - beginDate.getTime())/1000);
         setValue(interval);
         DateFormat sdff = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");

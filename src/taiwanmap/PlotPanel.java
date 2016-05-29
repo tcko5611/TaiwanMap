@@ -40,10 +40,9 @@ public class PlotPanel extends JPanel implements Observer{
     ArrayList<Location> locs; // Taiwan map
     ArrayList<Point> drawPts; // Taiwan map
     private HashMap<Integer, ArrayList<Ais>> shipsTrace;
-    private HashMap<Integer, Ais> ships;
+    // private HashMap<Integer, Ais> ships;
     HashMap<Integer, ArrayList<Point> > shipsTracePts;
     ArrayList<Point> shipsPts;
-    // ArrayList<Integer>mmsiPts;
     double x0; // the left
     double y0; // the top 
     double x1; // the right
@@ -55,33 +54,73 @@ public class PlotPanel extends JPanel implements Observer{
     BufferedImage blueShip;
     BufferedImage redShip;
     // BufferedImage taiwan;
+    @Override
+    public void updateAises(ArrayList<Ais> aises) {
+        shipsTrace.clear();
+        for (Ais ais : aises) {
+           addAis(ais); 
+        }
+        updateShipsPtsFromShipsTrace();
+        repaint();
+    }
+    private void updateShipsPtsFromShipsTrace() {
+        lock.lock();
+        try {
+            // ships.put(ais.getMmsi(), ais);
+            shipsPts.clear();
+            for (Map.Entry<Integer, ArrayList<Ais>> entry : shipsTrace.entrySet()) {
+                ArrayList<Ais> aises = entry.getValue();
+                if (aises.isEmpty()) continue;
+                Ais ais = aises.get(aises.size()-1);
+                double x = ais.getLng();
+                double y = ais.getLat();
+                Point p = translateLocToPoint(x, y);
+                if (p != null) {
+                    p.putMmsi(ais.getMmsi());
+                    p.putHeading(ais.getHeading());
+                    p.putSpeed(ais.getSpeed());
+                    shipsPts.add(p);
+                }                
+            }
+        } finally {
+            lock.unlock();
+        }    
+    }
+    private void updateShipsTracePtsFromShipsTrace() {
+        lock.lock();
+        try {
+            // ships.put(ais.getMmsi(), ais);
+            shipsTracePts.clear();
+            for (Map.Entry<Integer, ArrayList<Ais>> entry : shipsTrace.entrySet()) {
+                Integer mmsi = entry.getKey();
+                ArrayList<Ais> aises = entry.getValue();
+                if (aises.isEmpty()) continue;
+                ArrayList<Point> pts = new ArrayList<Point>();
+                for(Ais ais : aises) {
+                    double x = ais.getLng();
+                    double y = ais.getLat();
+                    Point p = translateLocToPoint(x, y);
+                    if (p != null) {
+                        p.putMmsi(ais.getMmsi());
+                        p.putHeading(ais.getHeading());
+                        p.putSpeed(ais.getSpeed());
+                        pts.add(p);
+                    }
+                }
+                shipsTracePts.put(mmsi, pts);            
+            }
+        } finally {
+            lock.unlock();
+        }    
+    }
     /**
      * Observer function to watch MessageSender
      * @param ais ais from message sender
      */
     @Override 
-    public void update(Ais ais, Date date) {
+    public void update(Ais ais) {
         addAis(ais);
-        lock.lock();
-        try {
-            ships.put(ais.getMmsi(), ais);
-            shipsPts.clear();
-            // mmsiPts.clear();
-            for (Map.Entry<Integer, Ais> entry : ships.entrySet()) {
-                double x = entry.getValue().getLng();
-                double y = entry.getValue().getLat();
-                Point p = translateLocToPoint(x, y);
-                if (p != null) {
-                    p.putMmsi(entry.getValue().getMmsi());
-                    p.putHeading(entry.getValue().getHeading());
-                    p.putSpeed(entry.getValue().getSpeed());
-                    shipsPts.add(p);
-                    // mmsiPts.add(entry.getKey());
-                }  
-            }
-        } finally {
-            lock.unlock();
-        }
+        updateShipsPtsFromShipsTrace();
         repaint();
     }
     public PlotPanel() {
@@ -89,10 +128,9 @@ public class PlotPanel extends JPanel implements Observer{
         locs = taiwanMap.getLocs();
         drawPts = new ArrayList<Point>();
         shipsTrace = new HashMap<Integer, ArrayList<Ais>>();
-        ships = new HashMap<Integer, Ais>();
+        // ships = new HashMap<Integer, Ais>();
         shipsTracePts = new HashMap<Integer, ArrayList<Point> >();
         shipsPts = new ArrayList<Point>();
-        // mmsiPts = new ArrayList<Integer>();
         x0 = 119;
         x1 = 123;
         y0 = 25.5;
@@ -174,7 +212,7 @@ public class PlotPanel extends JPanel implements Observer{
                 shipsTracePts.put(mmsi, pts);
             }
         } finally {
-         lock.unlock();
+            lock.unlock();
         }
     }
     /**
@@ -198,10 +236,11 @@ public class PlotPanel extends JPanel implements Observer{
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
-        shipsTrace.clear();
-        ships.clear();
-        shipsPts.clear();
-        // mmsiPts.clear();
+        // shipsTrace.clear();
+        // ships.clear();
+        // shipsPts.clear();
+        this.updateShipsPtsFromShipsTrace();
+        this.updateShipsTracePtsFromShipsTrace();
         translateLocToPoint();
         repaint();
     }
@@ -385,11 +424,10 @@ public class PlotPanel extends JPanel implements Observer{
         this.drawShips = new DrawTraceShips();
     }
     void clearData() {     
-        this.ships.clear();
+        // this.ships.clear();
         this.shipsPts.clear();
         this.shipsTrace.clear();
         this.shipsTracePts.clear();
-        // this.mmsiPts.clear();
     }
 }
 class Point {

@@ -23,7 +23,7 @@ public class MessageSender implements Runnable{
     int aisesIndex;
     Date startDate;
     Date endDate;
-    Date currentDate;
+    // Date currentDate;
     int speed; // min/sec
     LinkedList<Observer> observers;
     Boolean stop;
@@ -41,7 +41,7 @@ public class MessageSender implements Runnable{
         aisesIndex = 0;
         this.startDate = startDate;
         this.endDate = endDate;
-        currentDate = startDate;
+        // currentDate = startDate;
         this.speed = speed * 1024;
         stop = false;
         pause = false;
@@ -65,10 +65,16 @@ public class MessageSender implements Runnable{
      *  call observers to upddate
      * @param ais : ais send to observers,  
      */
-    public void notifyObservers(Ais ais, Date date) {
+    public void notifyObservers(Ais ais) {
        for(Iterator<Observer> iter = observers.iterator(); iter.hasNext();) {
           Observer obj = iter.next();
-          obj.update(ais, date);
+          obj.update(ais);
+       }
+    } 
+    public void notifyObserversAises(ArrayList<Ais> aises) {
+       for(Iterator<Observer> iter = observers.iterator(); iter.hasNext();) {
+          Observer obj = iter.next();
+          obj.updateAises(aises);
        }
     } 
     /**
@@ -77,20 +83,29 @@ public class MessageSender implements Runnable{
      */
     @Override
     public void run() {
-        currentDate = startDate;
-        for (; aisesIndex < aises.size(); aisesIndex ++) {
-            if (getStop()) break;
-            Ais ais = aises.get(aisesIndex);
-            currentDate = ais.getDate();
-            notifyObservers(ais, currentDate);
-            try {
-                Thread.sleep(getSpeed());
-            } catch (InterruptedException ex) {
-                Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            while (getPause()) {
+        // currentDate = startDate;
+        
+        try {
+            OuterLoop:
+            while(true) {
+                int i = 0;
+                for (; aisesIndex < aises.size(); aisesIndex ++) {
+                    if (getStop()) break OuterLoop;
+                    Ais ais = aises.get(aisesIndex);
+                    // currentDate = ais.getDate();
+                    notifyObservers(ais);
+                    Thread.sleep(getSpeed());
+                    while (getPause() && !getStop()) {
+                        yield();
+                    }
+                }
+                if (getStop()) break OuterLoop;
                 yield();
             }
+            Debugger.log("OuterLoop end");
+        } catch (InterruptedException e) {
+            // Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, e);
+            Debugger.log("Interrupted, so exiting.");
         }
         /*
         while (currentDate.before(endDate) && !getStop()) {
@@ -120,7 +135,7 @@ public class MessageSender implements Runnable{
             }
         }
         */
-        return;
+
     }
     public synchronized void setStop() {
         stop = true;
@@ -148,6 +163,20 @@ public class MessageSender implements Runnable{
     public synchronized int getSpeed() {
       return speed;  
     }
+    public void backwardOneStep() {
+        ArrayList<Ais> aises = new ArrayList<Ais>();
+        if (aisesIndex > 0)  aisesIndex -= 1;
+        for (int i = 0; i < aisesIndex; i++) {
+            aises.add(this.aises.get(i));
+        }
+        notifyObserversAises(aises);
+    }
+    public void forwardOneStep() {
+        if (aisesIndex >= (aises.size() -1) ) return;
+        aisesIndex += 1;
+        Ais ais = aises.get(aisesIndex);
+        notifyObservers(ais);
+    }
 }
 /**
  * Observer interface that use for MessageSender
@@ -155,6 +184,7 @@ public class MessageSender implements Runnable{
  * @author T.C.KO
  */
 interface Observer {
-    public void update(Ais ais, Date date);
-    // public void updateAises(ArrayList<Ais> aises);
+    public void update(Ais ais);
+    public void updateAises(ArrayList<Ais> aises);
+    
 }
