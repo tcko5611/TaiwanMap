@@ -13,55 +13,132 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.swing.Box;
-import javax.swing.JFileChooser;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.TableRowSorter;
+import javax.swing.JPanel;
 
 /**
  *
  * @author DELL
  */
-public class AisTabFrame extends javax.swing.JFrame implements Observer{
-             
-    private Aises aises;
-    TableRowSorter<AllAisesTableModel> sorter;
-    AllAisesTableModel model;
+public class GraphAnalysisPanel extends JPanel implements Observer{
+    private Aises aises; // aises group
     DateFormat sdff = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
     MessageSender messageSender;
-    ExecutorService messageExecutor = Executors.newSingleThreadExecutor();;
-    
-    /**
-     * Creates new form AisTabFrame
-     */
-    public AisTabFrame() {
-        initComponents();
-        
-//        dataPanel.setBounds(0, 0, 998, 589);
-//        dataPanel.setSize(new Dimension(998, 589));
+    ExecutorService messageExecutor;
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(TestFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(TestFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(TestFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(TestFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                String fileName = "d:\\AIS\\0933aisdr.csv";
+                Aises aises = new Aises(fileName);
+                JPanel panel = new GraphAnalysisPanel();
+                               
+                panel.setBounds(0, 0, 1196, 680);
+                panel.setSize(new Dimension(1196, 680));
+                
+                JFrame frame = new JFrame();
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setSize(1216, 710);
+                frame.setLayout(null);
+                frame.setTitle("test data analysis");
+                frame.getContentPane().add(panel);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+                 ((GraphAnalysisPanel)panel).setAises(aises);
+            }
+        });
+    }    
+    public void setAises(Aises aises) {
+        this.aises = aises;
+        Date beginDate = aises.getBeginDate();
+        Date endDate = aises.getEndDate();
+        startTextField.setText(sdff.format(beginDate));
+        endTextField.setText(sdff.format(endDate));
+        startButton.setEnabled(true);
+        double lng = Double.parseDouble(lng0TextField.getText());
+        double lat = Double.parseDouble(lat0TextField.getText());
+        double range = Double.parseDouble(rangeTextField.getText());
+        Double lng0 = lng - range/2.0;
+        Double lng1 = lng + range/2.0;
+        Double lat0 = lat + range/2.0;
+        Double lat1 = lat - range/2.0;
+        ((PlotPanel)  plotPanel).setBoundary(lng0, lat0, lng1, lat1);
+        okButtonActionPerformed(null);
     }
     public void stop() {
         // messageExecutor.shutdownNow();
-        messageSender.setStop(); // TODO add your handling code here:
+        if (messageSender != null)messageSender.setStop(); // TODO add your handling code here:
         ((PlotPanel) plotPanel).clearData();
-        startButton.setEnabled(true);
-        pauseButton.setEnabled(false);
-        continueButton.setEnabled(false);
-        slowButton.setEnabled(false);
-        fastButton.setEnabled(false);
-        stopButton.setEnabled(false);
-        startTextField.setEditable(true);
-        okButton.setEnabled(true);
+        this.startButton.setEnabled(true);
+        this.pauseButton.setEnabled(false);
+        this.continueButton.setEnabled(false);
+        this.slowButton.setEnabled(false);
+        this.fastButton.setEnabled(false);
+        this.stopButton.setEnabled(false);
+        this.startTextField.setEditable(true);
+        this.okButton.setEnabled(true);
         // this.readFileButton.setEnabled(true);
-        allTimeRadioButton.setEnabled(true);
-        realTimeRadioButton.setEnabled(true);
-        mmsiCheckBox.setEnabled(true);
-        traceCheckBox.setEnabled(false);
+        this.allTimeRadioButton.setEnabled(true);
+        this.realTimeRadioButton.setEnabled(true);
+        this.mmsiCheckBox.setEnabled(true);
+        this.traceCheckBox.setEnabled(false);
     }
+
+    /**
+     * Creates new form GraphAnalysisPanel
+     */
+    public GraphAnalysisPanel() {
+        initComponents();
+        buttonGroup1.add(realTimeRadioButton);
+        buttonGroup1.add(allTimeRadioButton);
+        realTimeRadioButton.setSelected(true);
+        this.mmsiCheckBox.setEnabled(true);
+        this.traceCheckBox.setEnabled(false);
+        messageSender = null;
+        messageExecutor = Executors.newSingleThreadExecutor();
+        infoTable.getTableHeader().setFont(new java.awt.Font("新細明體", 0, 14));
+        
+        ((MyTable)infoTable).setSelfModel();
+        
+        infoTable.getColumnModel().getColumn(1).setPreferredWidth(90);
+        infoTable.getColumnModel().getColumn(4).setPreferredWidth(120);
+        infoTable.getColumnModel().getColumn(0).setPreferredWidth(150);
+        this.okButton.setEnabled(false);
+        this.startButton.setEnabled(false);
+        this.pauseButton.setEnabled(false);
+        this.continueButton.setEnabled(false);
+        this.slowButton.setEnabled(false);
+        this.fastButton.setEnabled(false);
+        this.stopButton.setEnabled(false);
+        this.forwardButton.setEnabled(false);
+        this.backwardButton.setEnabled(false);
+        this.startTextField.setEditable(false);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -71,45 +148,22 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        fileNameLabel = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        beginDateLabel = new javax.swing.JLabel();
-        endDateLabel = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        maxLatLabel = new javax.swing.JLabel();
-        minLatLabel = new javax.swing.JLabel();
-        maxLngLabel = new javax.swing.JLabel();
-        minLngLabel = new javax.swing.JLabel();
-        tabbedPanel = new javax.swing.JTabbedPane();
-        dataPanel = new DataAnalysisPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        mmsiTextField = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        startDateTextField = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        stopDateTextField = new javax.swing.JTextField();
-        graphPanel = new GraphAnalysisPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        lat0TextField = new javax.swing.JTextField();
-        jLabel11 = new javax.swing.JLabel();
-        lng0TextField = new javax.swing.JTextField();
-        jLabel12 = new javax.swing.JLabel();
-        rangeTextField = new javax.swing.JTextField();
-        okButton = new javax.swing.JButton();
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        plotPanel = new PlotPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         infoTable = new MyTable();
         jProgressBar1 = new MyProgressBar();
-        plotPanel = new PlotPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        lat0TextField = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        lng0TextField = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        rangeTextField = new javax.swing.JTextField();
+        okButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jLabel13 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
         startTextField = new javax.swing.JTextField();
         startButton = new javax.swing.JButton();
         pauseButton = new javax.swing.JButton();
@@ -118,74 +172,40 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
         fastButton = new javax.swing.JButton();
         stopButton = new javax.swing.JButton();
         exitButton = new javax.swing.JButton();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
         speedLabel = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
         forwardButton = new javax.swing.JButton();
         backwardButton = new javax.swing.JButton();
-        jLabel17 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
         endTextField = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
-        jLabel18 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         realTimeRadioButton = new javax.swing.JRadioButton();
         mmsiCheckBox = new javax.swing.JCheckBox();
         allTimeRadioButton = new javax.swing.JRadioButton();
         traceCheckBox = new javax.swing.JCheckBox();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        readFileMenu = new javax.swing.JMenu();
-        quitMenu = new javax.swing.JMenu();
-        aboutMenu = new javax.swing.JMenu();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1201, 700));
+        setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
 
-        fileNameLabel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        fileNameLabel.setText("a.csv");
-        fileNameLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        plotPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        plotPanel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        plotPanel.setPreferredSize(new java.awt.Dimension(500, 500));
 
-        jLabel1.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel1.setText("開始時間：");
+        javax.swing.GroupLayout plotPanelLayout = new javax.swing.GroupLayout(plotPanel);
+        plotPanel.setLayout(plotPanelLayout);
+        plotPanelLayout.setHorizontalGroup(
+            plotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 448, Short.MAX_VALUE)
+        );
+        plotPanelLayout.setVerticalGroup(
+            plotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 448, Short.MAX_VALUE)
+        );
 
-        jLabel2.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel2.setText("結束時間：");
-
-        jLabel3.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel3.setText("分析檔案：");
-
-        beginDateLabel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        beginDateLabel.setText("2016.04.08 12:40:00");
-        beginDateLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        endDateLabel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        endDateLabel.setText("2016.05.14 18:05:00");
-        endDateLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        jLabel4.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel4.setText("最高座標：");
-
-        jLabel5.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel5.setText("最低座標：");
-
-        maxLatLabel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        maxLatLabel.setText("N:27.10");
-        maxLatLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        minLatLabel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        minLatLabel.setText("N:25.20");
-        minLatLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        maxLngLabel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        maxLngLabel.setText("E:122.10");
-        maxLngLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        minLngLabel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        minLngLabel.setText("E:120.10");
-        minLngLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        tabbedPanel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        infoTable.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        infoTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -196,118 +216,23 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        jScrollPane1.setViewportView(jTable1);
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jLabel6.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel6.setText("mmsi：");
-
-        mmsiTextField.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        mmsiTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mmsiTextFieldActionPerformed(evt);
-            }
-        });
-
-        jLabel7.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel7.setText("開始時間：");
-
-        startDateTextField.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        startDateTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                startDateTextFieldActionPerformed(evt);
-            }
-        });
-
-        jLabel8.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel8.setText("結束時間：");
-
-        stopDateTextField.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        stopDateTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stopDateTextFieldActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel6))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(stopDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(startDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(mmsiTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(24, 24, 24))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(mmsiTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(startDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(stopDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout dataPanelLayout = new javax.swing.GroupLayout(dataPanel);
-        dataPanel.setLayout(dataPanelLayout);
-        dataPanelLayout.setHorizontalGroup(
-            dataPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(dataPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 642, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        dataPanelLayout.setVerticalGroup(
-            dataPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(dataPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(dataPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(dataPanelLayout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-
-        tabbedPanel.addTab("資料分析", dataPanel);
-
-        graphPanel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jScrollPane3.setViewportView(infoTable);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel9.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel9.setText("地圖中央座標");
+        jLabel4.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel4.setText("地圖中央座標");
 
-        jLabel10.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel10.setText("N：");
+        jLabel5.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel5.setText("N：");
 
         lat0TextField.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
         lat0TextField.setText("23.5");
         lat0TextField.setMaximumSize(new java.awt.Dimension(30, 24));
         lat0TextField.setMinimumSize(new java.awt.Dimension(30, 24));
 
-        jLabel11.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel11.setText("E：");
+        jLabel8.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel8.setText("E：");
 
         lng0TextField.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
         lng0TextField.setText("121");
@@ -315,8 +240,8 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
         lng0TextField.setMinimumSize(new java.awt.Dimension(30, 24));
         lng0TextField.setPreferredSize(new java.awt.Dimension(30, 24));
 
-        jLabel12.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel12.setText("範圍：");
+        jLabel9.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel9.setText("範圍：");
 
         rangeTextField.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
         rangeTextField.setText("4");
@@ -339,11 +264,11 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel12)
-                            .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING))
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(rangeTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -351,7 +276,7 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
                         .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel11)
+                                .addComponent(jLabel8)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(okButton))))
@@ -361,57 +286,28 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(6, 6, 6)
-                .addComponent(jLabel9)
+                .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lat0TextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel10)
-                        .addComponent(jLabel11)
+                        .addComponent(jLabel5)
+                        .addComponent(jLabel8)
                         .addComponent(lng0TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(rangeTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel12)
+                        .addComponent(jLabel9)
                         .addComponent(okButton)))
                 .addContainerGap())
         );
 
-        infoTable.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        infoTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane3.setViewportView(infoTable);
-
-        plotPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        plotPanel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        plotPanel.setPreferredSize(new java.awt.Dimension(500, 500));
-
-        javax.swing.GroupLayout plotPanelLayout = new javax.swing.GroupLayout(plotPanel);
-        plotPanel.setLayout(plotPanelLayout);
-        plotPanelLayout.setHorizontalGroup(
-            plotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 448, Short.MAX_VALUE)
-        );
-        plotPanelLayout.setVerticalGroup(
-            plotPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 448, Short.MAX_VALUE)
-        );
-
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel13.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel13.setText("開始時間：");
-        jLabel13.setToolTipText("");
+        jLabel10.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel10.setText("開始時間：");
+        jLabel10.setToolTipText("");
 
         startTextField.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
         startTextField.setText("2016.05.13 00:40:00");
@@ -472,17 +368,17 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
             }
         });
 
-        jLabel14.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel14.setText("繪圖選項");
+        jLabel12.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel12.setText("繪圖選項");
 
-        jLabel15.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel15.setText("繪圖速度：");
+        jLabel13.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel13.setText("繪圖速度：");
 
         speedLabel.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
         speedLabel.setText("1");
 
-        jLabel16.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel16.setText("筆/秒");
+        jLabel14.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel14.setText("筆/秒");
 
         forwardButton.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
         forwardButton.setText("前進一筆");
@@ -500,9 +396,9 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
             }
         });
 
-        jLabel17.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel17.setText("結束時間：");
-        jLabel17.setToolTipText("");
+        jLabel15.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel15.setText("結束時間：");
+        jLabel15.setToolTipText("");
 
         endTextField.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
         endTextField.setText("2016.05.14 00:40:00");
@@ -514,9 +410,9 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel14)
+                    .addComponent(jLabel12)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(startTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -529,11 +425,11 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
                             .addComponent(exitButton)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(jLabel15)
+                            .addComponent(jLabel13)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(speedLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel16))
+                            .addComponent(jLabel14))
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
                             .addComponent(stopButton)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -545,7 +441,7 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(backwardButton))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(endTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(22, Short.MAX_VALUE))
@@ -553,14 +449,14 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jLabel14)
+                .addComponent(jLabel12)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
+                    .addComponent(jLabel10)
                     .addComponent(startTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel17)
+                    .addComponent(jLabel15)
                     .addComponent(endTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -579,16 +475,16 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exitButton)
-                    .addComponent(jLabel15)
+                    .addComponent(jLabel13)
                     .addComponent(speedLabel)
-                    .addComponent(jLabel16))
+                    .addComponent(jLabel14))
                 .addGap(22, 22, 22))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel18.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
-        jLabel18.setText("顯示選項");
+        jLabel11.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
+        jLabel11.setText("顯示選項");
 
         realTimeRadioButton.setFont(new java.awt.Font("新細明體", 0, 14)); // NOI18N
         realTimeRadioButton.setText("即時軌跡");
@@ -630,7 +526,7 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(realTimeRadioButton)
-                    .addComponent(jLabel18)
+                    .addComponent(jLabel11)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGap(111, 111, 111)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -642,7 +538,7 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(jLabel18)
+                .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(realTimeRadioButton)
@@ -654,190 +550,43 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout graphPanelLayout = new javax.swing.GroupLayout(graphPanel);
-        graphPanel.setLayout(graphPanelLayout);
-        graphPanelLayout.setHorizontalGroup(
-            graphPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(graphPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(graphPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
-                    .addComponent(plotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(graphPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(443, Short.MAX_VALUE))
-        );
-        graphPanelLayout.setVerticalGroup(
-            graphPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(graphPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21)
-                .addComponent(plotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(43, Short.MAX_VALUE))
-            .addGroup(graphPanelLayout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-
-        tabbedPanel.addTab("圖型分析", graphPanel);
-
-        readFileMenu.setText("檔案");
-        readFileMenu.setFont(new java.awt.Font("微軟正黑體", 0, 14)); // NOI18N
-        readFileMenu.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                readFileMenuMousePressed(evt);
-            }
-        });
-        jMenuBar1.add(readFileMenu);
-
-        quitMenu.setText("離開");
-        quitMenu.setFont(new java.awt.Font("微軟正黑體", 0, 14)); // NOI18N
-        quitMenu.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                quitMenuMousePressed(evt);
-            }
-        });
-        jMenuBar1.add(quitMenu);
-
-        aboutMenu.setText("關於");
-        aboutMenu.setFont(new java.awt.Font("微軟正黑體", 0, 14)); // NOI18N
-        aboutMenu.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                aboutMenuMousePressed(evt);
-            }
-        });
-        jMenuBar1.add(aboutMenu);
-
-        setJMenuBar(jMenuBar1);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(18, 18, 18)
-                        .addComponent(fileNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 480, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(18, 18, 18)
-                                .addComponent(endDateLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(18, 18, 18)
-                                .addComponent(beginDateLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(33, 33, 33)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(26, 26, 26)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(minLatLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                            .addComponent(maxLatLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(maxLngLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
-                            .addComponent(minLngLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(tabbedPanel)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+                    .addComponent(plotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(fileNameLabel)
-                    .addComponent(jLabel3))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(beginDateLabel)
-                    .addComponent(jLabel4)
-                    .addComponent(maxLatLabel)
-                    .addComponent(maxLngLabel))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(endDateLabel)
-                    .addComponent(jLabel5)
-                    .addComponent(minLatLabel)
-                    .addComponent(minLngLabel))
-                .addGap(39, 39, 39)
-                .addComponent(tabbedPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 654, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(plotPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void readFileMenuMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_readFileMenuMousePressed
-        // TODO add your handling code here:
-        JFileChooser c = new JFileChooser();
-        FileFilter filter = new FileNameExtensionFilter("csv file", new String[] {"csv"});
-        c.setFileFilter(filter);
-        // Demonstrate "Open" dialog:
-        int rVal = c.showOpenDialog(this);
-        if (rVal == JFileChooser.APPROVE_OPTION) {
-            fileNameLabel.setText(c.getCurrentDirectory().toString() + "\\" + c.getSelectedFile().getName());
-            aises = new Aises(fileNameLabel.getText());
-            Date beginDate = aises.getBeginDate();
-            Date endDate = aises.getEndDate();
-            double maxLat = aises.getMaxLat();
-            double minLat = aises.getMinLat();
-            double maxLng = aises.getMaxLng();
-            double minLng = aises.getMinLng();
-        
-            beginDateLabel.setText(sdff.format(beginDate));
-            endDateLabel.setText(sdff.format(endDate));
-            maxLatLabel.setText(" N:" + String.format("%.2f", maxLat));
-            minLatLabel.setText(" N:" + String.format("%.2f", minLat));
-            maxLngLabel.setText(" E:" + String.format("%.2f", maxLng));
-            minLngLabel.setText(" E:" + String.format("%.2f", minLng));
-            ((GraphAnalysisPanel) graphPanel).setAises(aises);
-            // ((DataAnalysisPanel) dataPanel).setAises(aises);
-        }
-    }//GEN-LAST:event_readFileMenuMousePressed
-
-    private void quitMenuMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_quitMenuMousePressed
-        // TODO add your handling code here:
-        System.exit(0);
-    }//GEN-LAST:event_quitMenuMousePressed
-
-    private void aboutMenuMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_aboutMenuMousePressed
-        // TODO add your handling code here:
-        String str = "鴻祺航太有限公司 製作銷售\n 台北市民權東路6段264號2樓\n @2016\n 設計者:\n Hungchi. Liu\n Dr. T. Ko\n" + 
-                " Dr. C. Tsai\n LINE ID: hc66\n" + " Tel: 02-2634-9343\n" + " Fax: 02-2634-9342\n" + " www.hasco.com.tw";
-        JOptionPane.showMessageDialog(null, str);
-    }//GEN-LAST:event_aboutMenuMousePressed
-
-    private void mmsiTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mmsiTextFieldActionPerformed
-        model.fireTableDataChanged();// TODO add your handling code here:
-    }//GEN-LAST:event_mmsiTextFieldActionPerformed
-
-    private void startDateTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startDateTextFieldActionPerformed
-        // TODO add your handling code here:
-        model.fireTableDataChanged();
-    }//GEN-LAST:event_startDateTextFieldActionPerformed
-
-    private void stopDateTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopDateTextFieldActionPerformed
-        // TODO add your handling code here:
-        model.fireTableDataChanged();
-    }//GEN-LAST:event_stopDateTextFieldActionPerformed
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         double lng = Double.parseDouble(lng0TextField.getText());
@@ -944,7 +693,7 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
     }//GEN-LAST:event_fastButtonActionPerformed
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
-        stop();
+       stop();
     }//GEN-LAST:event_stopButtonActionPerformed
 
     private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
@@ -995,111 +744,45 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
         }// TODO add your handling code here:        // TODO add your handling code here:
     }//GEN-LAST:event_traceCheckBoxItemStateChanged
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AisTabFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AisTabFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AisTabFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AisTabFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                AisTabFrame frame = new AisTabFrame();
-                // GraphAnalysisPanel graphPanel = new GraphAnalysisPanel();
-                
-                // frame.getContentPane().add(frame.graphPanel);
-                frame.setVisible(true);
-                // new AisTabFrame().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu aboutMenu;
     private javax.swing.JRadioButton allTimeRadioButton;
     private javax.swing.JButton backwardButton;
-    private javax.swing.JLabel beginDateLabel;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton continueButton;
-    private javax.swing.JPanel dataPanel;
-    private javax.swing.JLabel endDateLabel;
     private javax.swing.JTextField endTextField;
     private javax.swing.JButton exitButton;
     private javax.swing.JButton fastButton;
-    private javax.swing.JLabel fileNameLabel;
     private javax.swing.JButton forwardButton;
-    private javax.swing.JPanel graphPanel;
     private javax.swing.JTable infoTable;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JProgressBar jProgressBar1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTextField lat0TextField;
     private javax.swing.JTextField lng0TextField;
-    private javax.swing.JLabel maxLatLabel;
-    private javax.swing.JLabel maxLngLabel;
-    private javax.swing.JLabel minLatLabel;
-    private javax.swing.JLabel minLngLabel;
     private javax.swing.JCheckBox mmsiCheckBox;
-    private javax.swing.JTextField mmsiTextField;
     private javax.swing.JButton okButton;
     private javax.swing.JButton pauseButton;
     private javax.swing.JPanel plotPanel;
-    private javax.swing.JMenu quitMenu;
     private javax.swing.JTextField rangeTextField;
-    private javax.swing.JMenu readFileMenu;
     private javax.swing.JRadioButton realTimeRadioButton;
     private javax.swing.JButton slowButton;
     private javax.swing.JLabel speedLabel;
     private javax.swing.JButton startButton;
-    private javax.swing.JTextField startDateTextField;
     private javax.swing.JTextField startTextField;
     private javax.swing.JButton stopButton;
-    private javax.swing.JTextField stopDateTextField;
-    private javax.swing.JTabbedPane tabbedPanel;
     private javax.swing.JCheckBox traceCheckBox;
     // End of variables declaration//GEN-END:variables
 
@@ -1110,7 +793,7 @@ public class AisTabFrame extends javax.swing.JFrame implements Observer{
 
     @Override
     public void updateAises(ArrayList<Ais> aises) {
-        return;
+       return;
     }
 
     @Override

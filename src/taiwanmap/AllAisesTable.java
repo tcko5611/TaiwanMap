@@ -19,7 +19,7 @@ import javax.swing.table.TableRowSorter;
  *
  * @author T.C.KO
  */
-public class AllAisesTable extends javax.swing.JTable {
+public class AllAisesTable extends JTable {
     public static void main(String[] args) throws ParseException {
         String fileName = "d:\\AIS\\0933aisdr.csv";
         Aises aises = new Aises(fileName);
@@ -94,7 +94,7 @@ class AllAisesTableModel extends AbstractTableModel{
                 str = ais.getHeading().toString();
                 break;
             case 8:
-                str = ais.getRot().toString();
+                str = ais.getRot();
                 break;
             case 9:
                 str = ais.getStatus();
