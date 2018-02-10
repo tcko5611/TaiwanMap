@@ -49,8 +49,8 @@ public class TaiwanMap {
                 minLong = loc.getLongitude();            
             }
         }
-        // Debugger.log("max lat: " + maxLat + ", min lat: " + minLat);
-        // Debugger.log("max long: " + maxLong + ", min long: " + minLong);
+        Debugger.log("max lat: " + maxLat + ", min lat: " + minLat);
+        Debugger.log("max long: " + maxLong + ", min long: " + minLong);
     }
     /**
      * 
